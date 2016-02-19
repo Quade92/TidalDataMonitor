@@ -33,13 +33,19 @@ function LiveLineGraph() {
             .attr("stroke", "gray")
             .attr("stroke-width", 1);
     };
-    // TODO: calculate cusor_x by latest status
+    self.update_cursor_x = function(){
+        for (var i=0; i<self.cursor_x.length; i++){
+            if(self.cursor_x[i]<0){
+                self.cursor_x[i]+=self.w;
+            }
+        }
+    };
     self.render_graph = function () {
         // render cursor lines
         for (var i = 0; i < self.cursor_x.length; i++) {
             self.cursor_x[i] -= self.wps;
         }
-        // TODO: no appending new cursor lines
+        self.update_cursor_x();
         self.svg.selectAll("line")
             .data(self.cursor_x)
             .attr("x1", function (d, i) {
