@@ -16,18 +16,16 @@ function TimeAxis(timescale) {
 
 function TimeScale(data_set) {
     var self = this;
-    self.data_set = data_set;
-    self.data_set.forEach(function (d){
-        d["timestamp"] = new Date(d["timestamp"]);
+    self.data_set = data_set.map(function(d){
+        return new Date(d["timestamp"]);
     });
-    // TODO: default width is 800
     self.scale = d3.time.scale()
         .domain([
             d3.min(self.data_set, function (d) {
-                return d["timestamp"];
+                return d;
             }),
             d3.max(self.data_set, function (d) {
-                return d["timestamp"];
+                return d;
             })
         ])
         .range([0, 740]);
