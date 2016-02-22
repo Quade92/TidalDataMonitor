@@ -1,8 +1,8 @@
-function Cursors(svg, wps) {
+function Cursors(svg, cursor_count, wps) {
     var self = this;
     self.parent_svg = svg;
     self.cursor_x = [];
-    self.cursor_count = 10;
+    self.cursor_count = cursor_count;
     self.cursor_svg_margin = 30;
     self.wps = wps;
     self.init = function () {
@@ -16,6 +16,7 @@ function Cursors(svg, wps) {
             .attr("height", self.parent_svg.attr("height") - 2 * self.cursor_svg_margin);
         var cursor_g = cursor_svg.append("g")
             .attr("class", "cursor-g");
+        //insert cursor lines
         cursor_g.selectAll("line")
             .data(self.cursor_x)
             .enter()
@@ -60,6 +61,7 @@ function LiveLineGraph() {
     self.timespan = 600;
     self.w = 800;
     self.h = 500;
+    self.cursor_count = 10;
     self.wps = self.w / self.timespan;
     self.container_id = "live-graph-div";
 
@@ -68,7 +70,7 @@ function LiveLineGraph() {
             .append("svg")
             .attr("width", self.w)
             .attr("height", self.h);
-        self.cursors = new Cursors(self.svg, self.wps);
+        self.cursors = new Cursors(self.svg, self.cursor_count, self.wps);
         self.cursors.init();
         // TODO: init scaled axis
         // TODO: load data from api
@@ -77,6 +79,23 @@ function LiveLineGraph() {
     self.render_graph = function () {
         // render cursor lines
         self.cursors.update();
+    };
+
+    self.fetch_data = function(){
+        var basic_auth = btoa(Cookies.get("un")+":"+Cookies.get("pwd"));
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:5000/latest-record-set/"+self.timespan,
+            headers: {
+                "Authorization": "Basic " + basic_auth
+            },
+            dataType: 'json',
+            complete: function (data) {
+                if (data["responseJSON"]["err"] == "False") {
+                    self.data_set = data["responseJSON"]["result"];
+                }
+            }
+        })
     };
 }
 
