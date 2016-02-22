@@ -1,0 +1,6 @@
+.timeaxis-g path,
+.timeaxis-g line{
+    fill: none;
+    stroke: black;
+    stroke-width: 1px;
+}
