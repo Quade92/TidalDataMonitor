@@ -19,6 +19,48 @@ function TimeAxis(timescale) {
     }
 }
 
+function LinePaths(data_set, timescale) {
+    var self = this;
+    self.parent_svg = d3.select(".live-graph-svg");
+    self.timescale = timescale;
+    self.data_set = data_set.map(function (d) {
+        var json = {};
+        json.timestamp = d.timestamp;
+        //json.value = d.sensors.AN1.value;
+        // for testing
+        json.value = Math.floor(100*Math.random());
+        return json;
+    });
+    self.linepaths_group = self.parent_svg.append("g")
+        .attr("class", "linepaths-g");
+    self.linegraph = self.linepaths_group.append("path")
+        .attr("stroke", "blue")
+        .attr("stroke-width", 1)
+        .attr("fill", "none");
+    self.linefunction = d3.svg.line()
+        .x(function (d) {
+            var date = new Date(d.timestamp);
+            return self.timescale(date);
+        })
+        .y(function (d) {
+            return d.value;
+            //return d.value;
+        })
+        .interpolate("basis");
+    self.init = function(){
+        self.linegraph.attr("d", self.linefunction(self.data_set));
+    };
+    self.update = function (data_set) {
+        var json = {};
+        json.timestamp = data_set[0].timestamp;
+        // for testing
+        json.value = Math.floor(100*Math.random());
+        self.data_set.unshift(json);
+        self.data_set.pop();
+        self.linegraph.attr("d", self.linefunction(self.data_set));
+    };
+}
+
 function TimeScale(data_set) {
     var self = this;
     self.data_set = data_set.map(function (d) {
@@ -54,8 +96,9 @@ function LiveLineGraph() {
     self.svg = null;
     self.timeaxis = null;
     self.timescale = null;
+    self.linepaths = null;
     self.data_set = [];
-    self.timespan = 600;
+    self.timespan = 100;
     self.w = 800;
     self.h = 500;
     self.container_id = "live-graph-div";
@@ -89,6 +132,7 @@ function LiveLineGraph() {
                     self.data_set.pop();
                     self.timescale.update(self.data_set);
                     self.timeaxis.slide();
+                    self.linepaths.update(self.data_set);
                 }
             }
         )
@@ -110,6 +154,8 @@ function LiveLineGraph() {
                 self.timescale = new TimeScale(self.data_set);
                 self.timeaxis = new TimeAxis(self.timescale.scale);
                 self.timeaxis.init();
+                self.linepaths = new LinePaths(self.data_set, self.timescale.scale);
+                self.linepaths.init();
             }
         })
     };
@@ -119,6 +165,6 @@ var graph = new LiveLineGraph();
 graph.init();
 
 // for test
-setInterval(function(){
+setInterval(function () {
     graph.update();
 }, 1000);
