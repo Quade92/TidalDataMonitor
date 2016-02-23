@@ -1,6 +1,21 @@
 .timeaxis-g path,
-.timeaxis-g line{
+.timeaxis-g line {
     fill: none;
     stroke: black;
     stroke-width: 1px;
+
+}
+
+.yaxis-g path,
+.yaxis-g line {
+    fill: none;
+    stroke: black;
+    stroke-width: 1px;
+
+}
+
+.linepaths-g path {
+    stroke: blue;
+    stroke-width: 1;
+    fill: none;
 }
