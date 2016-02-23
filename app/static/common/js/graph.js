@@ -26,10 +26,10 @@ function TimeScale(data_set) {
     });
     self.scale = d3.time.scale()
         .domain([
-            d3.max(self.data_set, function (d) {
+            d3.min(self.data_set, function (d) {
                 return d;
             }),
-            d3.min(self.data_set, function (d) {
+            d3.max(self.data_set, function (d) {
                 return d;
             })
         ])
@@ -39,10 +39,10 @@ function TimeScale(data_set) {
             return new Date(d["timestamp"]);
         });
         self.scale.domain([
-            d3.max(self.data_set, function (d) {
+            d3.min(self.data_set, function (d) {
                 return d;
             }),
-            d3.min(self.data_set, function (d) {
+            d3.max(self.data_set, function (d) {
                 return d;
             })
         ]);
@@ -82,10 +82,11 @@ function LiveLineGraph() {
                 complete: function (data) {
                     if (data["responseJSON"]["err"] == "False") {
                         var latest_record = data["responseJSON"]["result"];
-                        latest_record["timestamp"] += 1000;
+                        // for testing
+                        latest_record["timestamp"] = self.data_set[0]["timestamp"] + 1000;
                     }
-                    self.data_set.push(data);
-                    self.data_set.shift();
+                    self.data_set.unshift(latest_record);
+                    self.data_set.pop();
                     self.timescale.update(self.data_set);
                     self.timeaxis.slide();
                 }
@@ -116,3 +117,8 @@ function LiveLineGraph() {
 
 var graph = new LiveLineGraph();
 graph.init();
+
+// for test
+setInterval(function(){
+    graph.update();
+}, 1000);
