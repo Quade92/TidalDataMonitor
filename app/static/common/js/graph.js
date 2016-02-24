@@ -19,10 +19,11 @@ function TimeAxis(timescale) {
     }
 }
 
-function LinePaths(data_set, timescale) {
+function LinePaths(data_set, timescale, yscale) {
     var self = this;
     self.parent_svg = d3.select(".live-graph-svg");
     self.timescale = timescale;
+    self.yscale = yscale;
     self.data_set = data_set.map(function (d) {
         var json = {};
         json.timestamp = d.timestamp;
@@ -39,25 +40,26 @@ function LinePaths(data_set, timescale) {
             return self.timescale(date);
         })
         .y(function (d) {
-            return d.value;
+            return self.yscale(d.value);
         })
         .interpolate("basis");
     self.init = function () {
         self.linegraph.attr("d", self.linefunction(self.data_set));
     };
-    self.update = function (data_set, timescale) {
+    self.update = function (data_set, timescale, yscale) {
         var json = {};
         json.timestamp = data_set[0].timestamp;
         var second_latest_date = self.data_set[0].timestamp;
         json.value = data_set[0].sensors.AN1.value;
         self.data_set.pop();
+        self.yscale = yscale;
         self.linegraph
             .attr("d", self.linefunction(self.data_set))
             .attr("transform", null)
             .transition()
-            .duration(200)
-            .attr("transform", "translate(" +(timescale.scale(second_latest_date)
-            -timescale.scale(json.timestamp))+ ")");
+            .duration(json.timestamp-second_latest_date)
+            .attr("transform", "translate(" +(timescale(second_latest_date)
+            -timescale(json.timestamp))+ ")");
         self.data_set.unshift(json);
     };
 }
@@ -99,10 +101,10 @@ function YScale(data_set) {
     });
     self.scale = d3.scale.linear()
         .domain([
-            d3.min(self.data_set, function (d) {
+            d3.max(self.data_set, function (d) {
                 return d;
             }),
-            d3.max(self.data_set, function (d) {
+            d3.min(self.data_set, function (d) {
                 return d;
             })
         ])
@@ -112,10 +114,10 @@ function YScale(data_set) {
         self.data_set.unshift(latest_value);
         self.data_set.pop();
         self.domain([
-            d3.min(self.data_set, function (d) {
+            d3.max(self.data_set, function (d) {
                 return d;
             }),
-            d3.max(self.data_set, function (d) {
+            d3.min(self.data_set, function (d) {
                 return d;
             })
         ]);
@@ -182,7 +184,7 @@ function LiveLineGraph() {
                     }
                     self.data_set.unshift(latest_record);
                     self.data_set.pop();
-                    self.linepaths.update(self.data_set, self.timescale);
+                    self.linepaths.update(self.data_set, self.timescale.scale, self.yscale.scale);
                     self.timescale.update(self.data_set);
                     self.timeaxis.slide();
                     self.yaxis.update();
@@ -214,7 +216,7 @@ function LiveLineGraph() {
                 self.yscale = new YScale(self.data_set);
                 self.yaxis = new YAxis(self.yscale.scale);
                 self.yaxis.init();
-                self.linepaths = new LinePaths(self.data_set, self.timescale.scale);
+                self.linepaths = new LinePaths(self.data_set, self.timescale.scale, self.yscale.scale);
                 self.linepaths.init();
             }
         })
@@ -227,4 +229,4 @@ graph.init();
 // for test
 setInterval(function () {
     graph.update();
-}, 1000);
+}, 5000);
