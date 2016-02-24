@@ -29,7 +29,7 @@ function TimeAxis() {
             .tickFormat(d3.time.format("%H:%M:%S"));
         self.timeaxis_group.call(self.timeaxis);
     };
-    self.update_scale = function (latest_record) {
+    self.update = function (latest_record) {
         var latest_date = new Date(latest_record.timestamp);
         self.date_set.unshift(latest_date);
         self.date_set.pop();
@@ -41,13 +41,9 @@ function TimeAxis() {
                 return d;
             })
         ]);
-    };
-    self.slide = function () {
-        var duration = self.date_set[0] - self.date_set[1];
-        self.timeaxis_group.transition()
-            .duration(duration)         //TODO:duration need to be calculated
+        self.timeaxis_group
             .call(self.timeaxis);
-    }
+    };
 }
 
 function LinePaths() {
@@ -88,16 +84,11 @@ function LinePaths() {
         json.date = new Date(data_set[0].timestamp);
         json.value = data_set[0].sensors.AN1.value;
         self.data_set.pop();
+        self.data_set.unshift(json);
         self.timescale = timescale;
         self.yscale = yscale;
         self.linegraph
-            .attr("d", self.linefunction(self.data_set))
-            .attr("transform", null)
-            .transition()
-            .duration(json.date - second_latest_date)
-            .attr("transform", "translate(" + (self.timescale(second_latest_date)
-            - self.timescale(json.date)) + ")");
-        self.data_set.unshift(json);
+            .attr("d", self.linefunction(self.data_set));
     };
 }
 
@@ -131,7 +122,7 @@ function YAxis() {
             .orient("left");
         self.yaxis_group.call(self.yaxis);
     };
-    self.update_scale = function (latest_record) {
+    self.update = function (latest_record) {
         var latest_value = latest_record.sensor.AN1.value;
         self.value_set.unshift(latest_value);
         self.value_set.pop();
@@ -180,19 +171,18 @@ function LiveLineGraph() {
                     "Authorization": "Basic " + basic_auth
                 },
                 dataType: "json",
-                complete: function (data) {
-                    if (data["responseJSON"]["err"] == "False") {
-                        var latest_record = data["responseJSON"]["result"];
+                complete: function (resp) {
+                    if (resp["responseJSON"]["err"] == "False") {
+                        var latest_record = resp["responseJSON"]["result"];
                         // for testing
-                        latest_record["timestamp"] = self.data_set[0]["timestamp"] + 1000;
+                        //latest_record["timestamp"] = self.data_set[0]["timestamp"] + 1000;
                         latest_record.sensors.AN1.value = Math.floor(Math.random() * 100);
                     }
                     self.data_set.unshift(latest_record);
                     self.data_set.pop();
-                    self.linepaths.update(self.data_set, self.timeaxis.scale, self.yaxis.scale);
-                    self.timeaxis.update_scale(latest_record);
-                    self.timeaxis.slide();
+                    self.timeaxis.update(latest_record);
                     self.yaxis.update(latest_record);
+                    self.linepaths.update(self.data_set, self.timeaxis.scale, self.yaxis.scale);
                 }
             }
         )
