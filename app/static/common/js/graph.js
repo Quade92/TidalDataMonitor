@@ -75,7 +75,7 @@ function LinePaths() {
             .y(function (d) {
                 return self.yscale(d.value);
             })
-            .interpolate("basis");
+            .interpolate("linear");
         self.linegraph.attr("d", self.linefunction(self.data_set));
     };
     self.update = function (data_set, timescale, yscale) {
@@ -123,7 +123,7 @@ function YAxis() {
         self.yaxis_group.call(self.yaxis);
     };
     self.update = function (latest_record) {
-        var latest_value = latest_record.sensor.AN1.value;
+        var latest_value = latest_record.sensors.AN1.value;
         self.value_set.unshift(latest_value);
         self.value_set.pop();
         self.scale.domain([
@@ -134,10 +134,8 @@ function YAxis() {
                 return d;
             })
         ]);
-    };
-    self.update = function () {
         self.yaxis_group.transition()
-            .duration(500)         //TODO:duration need to be calculated
+            .duration(500)
             .call(self.yaxis);
     };
 }
@@ -174,15 +172,14 @@ function LiveLineGraph() {
                 complete: function (resp) {
                     if (resp["responseJSON"]["err"] == "False") {
                         var latest_record = resp["responseJSON"]["result"];
-                        // for testing
-                        //latest_record["timestamp"] = self.data_set[0]["timestamp"] + 1000;
-                        latest_record.sensors.AN1.value = Math.floor(Math.random() * 100);
+                        if (latest_record.timestamp != self.data_set[0].timestamp) {
+                            self.data_set.unshift(latest_record);
+                            self.data_set.pop();
+                            self.timeaxis.update(latest_record);
+                            self.yaxis.update(latest_record);
+                            self.linepaths.update(self.data_set, self.timeaxis.scale, self.yaxis.scale);
+                        }
                     }
-                    self.data_set.unshift(latest_record);
-                    self.data_set.pop();
-                    self.timeaxis.update(latest_record);
-                    self.yaxis.update(latest_record);
-                    self.linepaths.update(self.data_set, self.timeaxis.scale, self.yaxis.scale);
                 }
             }
         )
@@ -200,17 +197,13 @@ function LiveLineGraph() {
             complete: function (data) {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
+                    self.timeaxis = new TimeAxis();
+                    self.timeaxis.init(self.data_set);
+                    self.yaxis = new YAxis();
+                    self.yaxis.init(self.data_set);
+                    self.linepaths = new LinePaths();
+                    self.linepaths.init(self.data_set, self.timeaxis.scale, self.yaxis.scale);
                 }
-                // for testing
-                for (var i = 0; i != self.data_set.length; i++) {
-                    self.data_set[i].sensors.AN1.value = Math.floor(Math.random() * 100);
-                }
-                self.timeaxis = new TimeAxis();
-                self.timeaxis.init(self.data_set);
-                self.yaxis = new YAxis();
-                self.yaxis.init(self.data_set);
-                self.linepaths = new LinePaths();
-                self.linepaths.init(self.data_set, self.timeaxis.scale, self.yaxis.scale);
             }
         })
     };
@@ -222,4 +215,4 @@ graph.init();
 // for test
 setInterval(function () {
     graph.update();
-}, 2000);
+}, 1000);
