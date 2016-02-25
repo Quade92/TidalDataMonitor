@@ -85,24 +85,36 @@ function LinePaths() {
             .on("mouseover", function (d) {
                 d3.select(this)
                     .attr("fill", "red");
-                self.linepaths_group
-                    .append("text")
+                self.linepaths_group.append("rect")
+                    .attr("class", "rect-cursor")
+                    .attr("width", 220)
+                    .attr("height", 50)
+                    .attr("rx", 15)
+                    .attr("ry", 15)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 2)
+                    .attr("x", self.timescale(d.date) + 10)
+                    .attr("y", self.yscale(d.value)-20)
+                    .attr("fill", "white");
+                self.linepaths_group.append("text")
                     .attr("class", "text-cursor")
                     .attr("x", self.timescale(d.date))
                     .attr("y", self.yscale(d.value))
                     .append("tspan")
-                    .attr("x", self.timescale(d.date)+20)
+                    .attr("x", self.timescale(d.date) + 20)
                     .attr("dy", 0)
-                    .text("x: " + d.date)
+                    .text("time: " + d.date.toLocaleString())
                     .append("tspan")
-                    .attr("x", self.timescale(d.date)+20)
+                    .attr("x", self.timescale(d.date) + 20)
                     .attr("dy", 20)
-                    .text("y: " + d.value);
+                    .text("value: " + d.value);
             })
             .on("mouseout", function (d) {
                 d3.select(this)
                     .attr("fill", "blue");
                 self.linepaths_group.selectAll(".text-cursor")
+                    .remove();
+                self.linepaths_group.selectAll(".rect-cursor")
                     .remove();
             });
         self.linefunction = d3.svg.line()
