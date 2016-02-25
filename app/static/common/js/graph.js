@@ -203,7 +203,7 @@ function LiveLineGraph() {
     self.linepaths = null;
     self.data_set = [];
     self.timespan = 100;
-    self.w = 800;
+    self.w = 1000;
     self.h = 500;
     self.container_id = "live-graph-div";
     self.init = function () {
