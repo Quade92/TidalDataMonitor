@@ -53,6 +53,7 @@ function LinePaths() {
     self.yscale = null;
     self.data_set = [];
     self.linepaths_group = null;
+    self.cursors = null;
     self.linegraph = null;
     self.linefunction = null;
     self.init = function (data_set, timescale, yscale) {
@@ -68,6 +69,18 @@ function LinePaths() {
             .attr("class", "linepaths-g")
             .attr("transform", "translate(30, 30)");
         self.linegraph = self.linepaths_group.append("path");
+        self.cursors = self.linepaths_group.selectAll("circle")
+            .data(self.data_set)
+            .enter()
+            .append("circle")
+            .attr("cx", function (d) {
+                return self.timescale(d.date);
+            })
+            .attr("cy", function (d) {
+                return self.yscale(d.value);
+            })
+            .attr("r", "3")
+            .attr("fill", "blue");
         self.linefunction = d3.svg.line()
             .x(function (d) {
                 return self.timescale(d.date);
@@ -79,7 +92,6 @@ function LinePaths() {
         self.linegraph.attr("d", self.linefunction(self.data_set));
     };
     self.update = function (data_set, timescale, yscale) {
-        var second_latest_date = self.data_set[0].date;
         var json = {};
         json.date = new Date(data_set[0].timestamp);
         json.value = data_set[0].sensors.AN1.value;
@@ -87,6 +99,13 @@ function LinePaths() {
         self.data_set.unshift(json);
         self.timescale = timescale;
         self.yscale = yscale;
+        self.cursors.data(self.data_set)
+            .attr("cx", function (d) {
+                return self.timescale(d.date);
+            })
+            .attr("cy", function (d) {
+                return self.yscale(d.value);
+            });
         self.linegraph
             .attr("d", self.linefunction(self.data_set));
     };
@@ -213,6 +232,6 @@ var graph = new LiveLineGraph();
 graph.init();
 
 // for test
-setInterval(function () {
-    graph.update();
-}, 1000);
+//setInterval(function () {
+//    graph.update();
+//}, 800);
