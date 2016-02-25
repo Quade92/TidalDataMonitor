@@ -73,6 +73,7 @@ function LinePaths() {
             .data(self.data_set)
             .enter()
             .append("circle")
+            .attr("class", "circle-cursor")
             .attr("cx", function (d) {
                 return self.timescale(d.date);
             })
@@ -80,7 +81,30 @@ function LinePaths() {
                 return self.yscale(d.value);
             })
             .attr("r", "3")
-            .attr("fill", "blue");
+            .attr("fill", "blue")
+            .on("mouseover", function (d) {
+                d3.select(this)
+                    .attr("fill", "red");
+                self.linepaths_group
+                    .append("text")
+                    .attr("class", "text-cursor")
+                    .attr("x", self.timescale(d.date))
+                    .attr("y", self.yscale(d.value))
+                    .append("tspan")
+                    .attr("x", self.timescale(d.date)+20)
+                    .attr("dy", 0)
+                    .text("x: " + d.date)
+                    .append("tspan")
+                    .attr("x", self.timescale(d.date)+20)
+                    .attr("dy", 20)
+                    .text("y: " + d.value);
+            })
+            .on("mouseout", function (d) {
+                d3.select(this)
+                    .attr("fill", "blue");
+                self.linepaths_group.selectAll(".text-cursor")
+                    .remove();
+            });
         self.linefunction = d3.svg.line()
             .x(function (d) {
                 return self.timescale(d.date);
@@ -232,6 +256,6 @@ var graph = new LiveLineGraph();
 graph.init();
 
 // for test
-//setInterval(function () {
-//    graph.update();
-//}, 800);
+setInterval(function () {
+    graph.update();
+}, 800);
