@@ -103,11 +103,11 @@ function LinePaths() {
                     .append("tspan")
                     .attr("x", self.timescale(d.date) + 20)
                     .attr("dy", 0)
-                    .text("time: " + d.date.toLocaleString())
+                    .text("时间: " + d.date.toLocaleString())
                     .append("tspan")
                     .attr("x", self.timescale(d.date) + 20)
                     .attr("dy", 20)
-                    .text("value: " + d.value);
+                    .text("数值: " + d.value);
             })
             .on("mouseout", function (d) {
                 d3.select(this)
@@ -263,3 +263,4 @@ function LiveLineGraph() {
         })
     };
 }
+
