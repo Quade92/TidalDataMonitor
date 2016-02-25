@@ -263,11 +263,3 @@ function LiveLineGraph() {
         })
     };
 }
-
-var graph = new LiveLineGraph();
-graph.init();
-
-// for test
-setInterval(function () {
-    graph.update();
-}, 800);

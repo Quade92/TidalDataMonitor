@@ -10,7 +10,7 @@ def hello_world():
 
 @app.route('/real-time')
 def real_time_graph():
-    return render_template("graph.html")
+    return render_template("realtime-graph.html")
 
 
 if __name__ == '__main__':
