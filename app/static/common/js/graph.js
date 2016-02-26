@@ -18,7 +18,7 @@ function TimeAxis(svg) {
                     return d;
                 })
             ])
-            .range([0, self.parent_svg.node().getBoundingClientRect().width]);
+            .range([0, self.parent_svg.node().getBoundingClientRect().width-60]);
         self.axis_group = d3.select(".svg-root-g")
             .append("g")
             .attr("class", "timeaxis-g")
@@ -316,17 +316,6 @@ function HistoryData() {
             complete: function (data) {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
-                    self.timeaxis = new TimeAxis(self.svg);
-                    self.timeaxis.init(self.data_set);
-                    self.yaxis = new YAxis(self.svg);
-                    self.yaxis.init(self.data_set);
-                    self.linepaths = new LinePaths(self.svg);
-                    self.linepaths.init(self.data_set, self.timeaxis.scale, self.yaxis.scale);
-                    self.zoom = d3.behavior.zoom()
-                        .x(self.timeaxis.scale)
-                        .scaleExtent([1, 5])
-                        .on("zoom", self.zoomed);
-                    d3.select(".rect-zoom-pan").call(self.zoom);
                     var tr = d3.select(".history-table-div").append("table")
                         .selectAll("tr")
                         .data(self.data_set)
@@ -340,6 +329,18 @@ function HistoryData() {
                         .html(function (d) {
                             return d.sensors.AN1.value;
                         });
+                    self.svg.attr("width", d3.select(".history-graph-div").node().getBoundingClientRect().width);
+                    self.timeaxis = new TimeAxis(self.svg);
+                    self.timeaxis.init(self.data_set);
+                    self.yaxis = new YAxis(self.svg);
+                    self.yaxis.init(self.data_set);
+                    self.linepaths = new LinePaths(self.svg);
+                    self.linepaths.init(self.data_set, self.timeaxis.scale, self.yaxis.scale);
+                    self.zoom = d3.behavior.zoom()
+                        .x(self.timeaxis.scale)
+                        .scaleExtent([1, 5])
+                        .on("zoom", self.zoomed);
+                    d3.select(".rect-zoom-pan").call(self.zoom);
                 }
             }
         })
