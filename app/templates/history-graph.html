@@ -1,0 +1,14 @@
+{% extends "base-with-navbar.html" %}
+
+{% block main_content %}
+    <div id="history-graph-div"></div>
+    <link rel="stylesheet" href="../static/common/css/graph.css" type="text/css">
+    <script src="../static/libs/d3js-3.5.16/dist/js/d3.min.js"></script>
+    <script src="../static/libs/jQuery-1.12.0/dist/js/jquery-1.12.0.min.js"></script>
+    <script src="../static/libs/js.cookie-2.1.0/dist/js/js.cookie-2.1.0.min.js"></script>
+    <script src="../static/common/js/graph.js"></script>
+    <script>
+        var graph = new HistoryLinegraph();
+        graph.init();
+    </script>
+{% endblock %}

@@ -19,7 +19,7 @@ function TimeAxis(svg) {
                 })
             ])
             .range([0, 740]);
-        self.axis_group = self.parent_svg.select(".svg-root-g")
+        self.axis_group = d3.select(".svg-root-g")
             .append("g")
             .attr("class", "timeaxis-g")
             .attr("transform", "translate(30, 470)");
@@ -69,7 +69,7 @@ function YAxis(svg) {
             ])
             .range([0, 440])
             .nice();
-        self.axis_group = self.parent_svg.select(".svg-root-g")
+        self.axis_group = d3.select(".svg-root-g")
             .append("g")
             .attr("class", "yaxis-g")
             .attr("transform", "translate(30, 30)");
@@ -102,7 +102,6 @@ function LinePaths(svg) {
     self.timescale = null;
     self.yscale = null;
     self.data_set = [];
-    self.linepaths_group = null;
     self.cursors = null;
     self.paths = null;
     self.linefunction = null;
@@ -115,13 +114,14 @@ function LinePaths(svg) {
         });
         self.timescale = timescale;
         self.yscale = yscale;
-        self.linepaths_group = self.parent_svg.select(".svg-root-g")
+        var linepaths_group = d3.select(".svg-root-g")
             .append("g")
             .attr("class", "linepaths-g")
             .attr("clip-path", "url(#clip)")
             .attr("transform", "translate(30, 30)");
-        self.paths = self.linepaths_group.append("path");
-        self.cursors = self.linepaths_group.selectAll("circle")
+        self.paths = linepaths_group.append("path")
+            .attr("class", "datapath");
+        self.cursors = linepaths_group.selectAll("circle")
             .data(self.data_set)
             .enter()
             .append("circle")
@@ -136,7 +136,10 @@ function LinePaths(svg) {
             .on("mouseover", function (d) {
                 d3.select(this)
                     .attr("fill", "red");
-                self.linepaths_group.append("rect")
+                self.parent_svg.append("g")
+                    .attr("class", "rect-cursor-g")
+                    .attr("transform", "translate(30, 30)")
+                    .append("rect")
                     .attr("class", "rect-cursor")
                     .attr("width", 220)
                     .attr("height", 50)
@@ -144,7 +147,7 @@ function LinePaths(svg) {
                     .attr("ry", 15)
                     .attr("x", self.timescale(d.date) + 10)
                     .attr("y", self.yscale(d.value) - 20);
-                self.linepaths_group.append("text")
+                d3.select(".rect-cursor-g").append("text")
                     .attr("class", "text-cursor")
                     .attr("x", self.timescale(d.date))
                     .attr("y", self.yscale(d.value))
@@ -160,9 +163,9 @@ function LinePaths(svg) {
             .on("mouseout", function (d) {
                 d3.select(this)
                     .attr("fill", "blue");
-                self.linepaths_group.selectAll(".text-cursor")
+                d3.selectAll(".text-cursor")
                     .remove();
-                self.linepaths_group.selectAll(".rect-cursor")
+                d3.select(".rect-cursor-g")
                     .remove();
             });
         self.linefunction = d3.svg.line()
@@ -275,7 +278,7 @@ function HistoryLinegraph() {
     self.w = 1000;
     self.h = 500;
     self.zoom = null;
-    self.container_id = "live-graph-div";
+    self.container_id = "history-graph-div";
     self.start_timestamp = null;
     self.end_timestamp = null;
     self.init = function () {
@@ -323,7 +326,7 @@ function HistoryLinegraph() {
                         .x(self.timeaxis.scale)
                         .scaleExtent([1, 5])
                         .on("zoom", self.zoomed);
-                    self.svg_group.select(".rect-zoom-pan").call(self.zoom);
+                    d3.select(".rect-zoom-pan").call(self.zoom);
                 }
             }
         })
