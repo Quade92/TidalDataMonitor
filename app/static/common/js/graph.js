@@ -18,7 +18,7 @@ function TimeAxis(svg) {
                     return d;
                 })
             ])
-            .range([0, 740]);
+            .range([0, self.parent_svg.node().getBoundingClientRect().width]);
         self.axis_group = d3.select(".svg-root-g")
             .append("g")
             .attr("class", "timeaxis-g")
@@ -26,7 +26,7 @@ function TimeAxis(svg) {
         self.axis = d3.svg.axis()
             .scale(self.scale)
             .orient("bottom")
-            .ticks(10)
+            .ticks(5)
             .tickFormat(d3.time.format("%H:%M:%S"));
         self.axis_group.call(self.axis);
     };
@@ -67,7 +67,7 @@ function YAxis(svg) {
                     return d;
                 }) * 0.9
             ])
-            .range([0, 440])
+            .range([0, self.parent_svg.node().getBoundingClientRect().height - 60])
             .nice();
         self.axis_group = d3.select(".svg-root-g")
             .append("g")
@@ -267,7 +267,7 @@ function LiveLinegraph() {
     };
 }
 
-function HistoryLinegraph() {
+function HistoryData() {
     var self = this;
     self.svg = null;
     self.svg_group = null;
@@ -275,14 +275,14 @@ function HistoryLinegraph() {
     self.yaxis = null;
     self.linepaths = null;
     self.data_set = [];
-    self.w = 1000;
-    self.h = 500;
     self.zoom = null;
-    self.container_id = "history-graph-div";
+    self.container_id = "history-graph-table-div";
+    self.w = d3.select(".history-graph-div").node().getBoundingClientRect().width;
+    self.h = 500;
     self.start_timestamp = null;
     self.end_timestamp = null;
     self.init = function () {
-        self.svg = d3.select("#" + self.container_id)
+        self.svg = d3.select(".history-graph-div")
             .append("svg")
             .attr("width", self.w)
             .attr("height", self.h)
@@ -293,15 +293,15 @@ function HistoryLinegraph() {
             .attr("id", "clip")
             .append("rect")
             .attr("x", 0)
-            .attr("y", -2)
-            .attr("width", 742)
-            .attr("height", 444);
+            .attr("y", -2)// circle-cursor's radius is 1.5
+            .attr("width", self.w - 60)
+            .attr("height", self.h - 60);
         self.svg_group.append("rect")
             .attr("class", "rect-zoom-pan")
             .attr("x", 30)
             .attr("y", 30)
-            .attr("width", 740)
-            .attr("height", 440);
+            .attr("width", self.w - 60)
+            .attr("height", self.h - 60);
         self.fetch_data();
     };
     self.fetch_data = function () {
@@ -327,6 +327,19 @@ function HistoryLinegraph() {
                         .scaleExtent([1, 5])
                         .on("zoom", self.zoomed);
                     d3.select(".rect-zoom-pan").call(self.zoom);
+                    var tr = d3.select(".history-table-div").append("table")
+                        .selectAll("tr")
+                        .data(self.data_set)
+                        .enter()
+                        .append("tr");
+                    tr.append("td")
+                        .html(function (d) {
+                            return d.timestamp;
+                        });
+                    tr.append("td")
+                        .html(function (d) {
+                            return d.sensors.AN1.value;
+                        });
                 }
             }
         })
