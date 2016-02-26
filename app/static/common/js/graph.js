@@ -62,10 +62,10 @@ function YAxis(svg) {
             .domain([
                 d3.max(self.value_set, function (d) {
                     return d;
-                })*1.1,
+                }) * 1.1,
                 d3.min(self.value_set, function (d) {
                     return d;
-                })*0.9
+                }) * 0.9
             ])
             .range([0, 440])
             .nice();
@@ -85,10 +85,10 @@ function YAxis(svg) {
         self.scale.domain([
             d3.max(self.value_set, function (d) {
                 return d;
-            })*1.1,
+            }) * 1.1,
             d3.min(self.value_set, function (d) {
                 return d;
-            })*0.9
+            }) * 0.9
         ]);
         self.axis_group.transition()
             .duration(500)
@@ -133,7 +133,6 @@ function LinePaths(svg) {
                 return self.yscale(d.value);
             })
             .attr("r", "3")
-            .attr("fill", "blue")
             .on("mouseover", function (d) {
                 d3.select(this)
                     .attr("fill", "red");
@@ -143,11 +142,8 @@ function LinePaths(svg) {
                     .attr("height", 50)
                     .attr("rx", 15)
                     .attr("ry", 15)
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 2)
                     .attr("x", self.timescale(d.date) + 10)
-                    .attr("y", self.yscale(d.value) - 20)
-                    .attr("fill", "white");
+                    .attr("y", self.yscale(d.value) - 20);
                 self.linepaths_group.append("text")
                     .attr("class", "text-cursor")
                     .attr("x", self.timescale(d.date))
@@ -297,6 +293,12 @@ function HistoryLinegraph() {
             .attr("y", -2)
             .attr("width", 742)
             .attr("height", 444);
+        self.svg_group.append("rect")
+            .attr("class", "rect-zoom-pan")
+            .attr("x", 30)
+            .attr("y", 30)
+            .attr("width", 740)
+            .attr("height", 440);
         self.fetch_data();
     };
     self.fetch_data = function () {
@@ -321,7 +323,7 @@ function HistoryLinegraph() {
                         .x(self.timeaxis.scale)
                         .scaleExtent([1, 5])
                         .on("zoom", self.zoomed);
-                    self.linepaths.linepaths_group.call(self.zoom);
+                    self.svg_group.select(".rect-zoom-pan").call(self.zoom);
                 }
             }
         })
