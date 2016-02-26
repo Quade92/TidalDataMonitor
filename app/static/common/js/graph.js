@@ -333,55 +333,12 @@ function HistoryLinegraph() {
             return self.linepaths.timescale(d.date);
         });
         self.linepaths.paths.attr("d", self.linepaths.linefunction(self.linepaths.data_set));
-        self.linepaths.linepaths_group.selectAll(".circle-cursor")
-            .remove();
-        self.linepaths.cursors = self.linepaths.linepaths_group.selectAll("circle")
-            .data(self.linepaths.data_set)
-            .enter()
-            .append("circle")
-            .attr("class", "circle-cursor")
+        self.linepaths.cursors.data(self.linepaths.data_set)
             .attr("cx", function (d) {
                 return self.linepaths.timescale(d.date);
             })
             .attr("cy", function (d) {
                 return self.linepaths.yscale(d.value);
-            })
-            .attr("r", "3")
-            .attr("fill", "blue")
-            .on("mouseover", function (d) {
-                d3.select(this)
-                    .attr("fill", "red");
-                self.linepaths.linepaths_group.append("rect")
-                    .attr("class", "rect-cursor")
-                    .attr("width", 220)
-                    .attr("height", 50)
-                    .attr("rx", 15)
-                    .attr("ry", 15)
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 2)
-                    .attr("x", self.linepaths.timescale(d.date) + 10)
-                    .attr("y", self.linepaths.yscale(d.value) - 20)
-                    .attr("fill", "white");
-                self.linepaths.linepaths_group.append("text")
-                    .attr("class", "text-cursor")
-                    .attr("x", self.linepaths.timescale(d.date))
-                    .attr("y", self.linepaths.yscale(d.value))
-                    .append("tspan")
-                    .attr("x", self.linepaths.timescale(d.date) + 20)
-                    .attr("dy", 0)
-                    .text("时间: " + d.date.toLocaleString())
-                    .append("tspan")
-                    .attr("x", self.linepaths.timescale(d.date) + 20)
-                    .attr("dy", 20)
-                    .text("数值: " + d.value);
-            })
-            .on("mouseout", function (d) {
-                d3.select(this)
-                    .attr("fill", "blue");
-                self.linepaths.linepaths_group.selectAll(".text-cursor")
-                    .remove();
-                self.linepaths.linepaths_group.selectAll(".rect-cursor")
-                    .remove();
             });
     }
 }
