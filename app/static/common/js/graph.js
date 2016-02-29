@@ -303,6 +303,23 @@ function HistoryData() {
             .attr("height", self.h - 60);
         self.fetch_data();
     };
+    self.update = function (start_ts, end_ts) {
+        var basic_auth = btoa(Cookies.get("un") + ":" + Cookies.get("pwd"));
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:5000/record-series/"+start_ts+"/"+end_ts,
+            headers: {
+                "Authorization": "Basic " + basic_auth
+            },
+            dataType: "json",
+            complete: function (data) {
+                if (data["responseJSON"]["err"] == "False") {
+                    self.data_set = data["responseJSON"]["result"];
+                    self.update_table();
+                }
+            }
+        })
+    };
     self.fetch_data = function () {
         var basic_auth = btoa(Cookies.get("un") + ":" + Cookies.get("pwd"));
         $.ajax({
@@ -331,6 +348,10 @@ function HistoryData() {
                 }
             }
         })
+    };
+    self.update_table = function(){
+        d3.select("#history-table-div").select("table").remove();
+        self.append_table();
     };
     self.append_table = function () {
         var table = d3.select("#history-table-div")

@@ -10,6 +10,7 @@
             <div class="form-inline col-md-7">
                 <div class="form-group">
                     <label for="startdate">开始时间：</label>
+
                     <div class='input-group date' id="startdtpicker">
                         <input type='text' class="form-control" id="startdate"/>
                     <span class="input-group-addon">
@@ -19,6 +20,7 @@
                 </div>
                 <div class="form-group">
                     <label for="enddate">结束时间：</label>
+
                     <div class='input-group date' id='enddtpicker'>
                         <input type='text' class="form-control" id="enddate"/>
                     <span class="input-group-addon">
@@ -26,25 +28,8 @@
                     </span>
                     </div>
                 </div>
-                <span><button class="btn btn-default" type="submit">提交</button></span>
+                <span><button class="btn btn-default" type="submit" id="datetime-btn">提交</button></span>
             </div>
-            <script type="text/javascript">
-                $(function () {
-                    $('#startdtpicker').datetimepicker({
-                        format: "YYYY/MM/DD HH:mm:ss"
-                    });
-                    $('#enddtpicker').datetimepicker({
-                        format: "YYYY/MM/DD HH:mm:ss",
-                        useCurrent: false //Important! See issue #1075
-                    });
-                    $("#startdtpicker").on("dp.change", function (e) {
-                        $('#enddtpicker').data("DateTimePicker").minDate(e.date);
-                    });
-                    $("#enddtpicker").on("dp.change", function (e) {
-                        $('#startdtpicker').data("DateTimePicker").maxDate(e.date);
-                    });
-                });
-            </script>
         </div>
     </div>
 
@@ -54,8 +39,27 @@
     <script src="../static/libs/moment-2.11.2/js/moment.js"></script>
     <script src="../static/libs/bootstrap-datetimepicker-4.17.37/js/bootstrap-datetimepicker.min.js"></script>
     <script src="../static/libs/d3js-3.5.16/js/d3.min.js"></script>
+    <script src="../static/common/js/button.js"></script>
     <script src="../static/common/js/graph.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('#startdtpicker').datetimepicker({
+                format: "YYYY/MM/DD HH:mm:ss"
+            });
+            $('#enddtpicker').datetimepicker({
+                format: "YYYY/MM/DD HH:mm:ss",
+                useCurrent: false //Important! See issue #1075
+            });
+            $("#startdtpicker").on("dp.change", function (e) {
+                $('#enddtpicker').data("DateTimePicker").minDate(e.date);
+            });
+            $("#enddtpicker").on("dp.change", function (e) {
+                $('#startdtpicker').data("DateTimePicker").maxDate(e.date);
+            });
+        });
+    </script>
     <script>
+        register_datetime_btn();
         var graph = new HistoryData();
         graph.init();
     </script>

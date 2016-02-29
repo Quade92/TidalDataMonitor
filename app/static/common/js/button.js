@@ -1,4 +1,4 @@
-function registerSigninBtn() {
+function register_signin_btn() {
     $("#signin-submit-btn").click(function (event) {
         var un = $("#inputUsername").val();
         var pwd = $("#inputPassword").val();
@@ -20,6 +20,15 @@ function registerSigninBtn() {
                     Cookies.set("pwd", pwd);
                 }
             }
-        })
+        });
+    });
+}
+
+function register_datetime_btn() {
+    $("#datetime-btn").click(function (event) {
+        var start_ts = $('#startdtpicker').data("DateTimePicker").date().unix() * 1000;
+        var end_ts = $("#enddtpicker").data("DateTimePicker").date().unix() * 1000;
+        event.preventDefault();
+        graph.update(start_ts, end_ts);
     });
 }
