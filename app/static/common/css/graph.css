@@ -39,3 +39,12 @@ div.history-table-div{
     height: 500px;
     overflow: auto;
 }
+
+div.history-graph-div{
+    border: 1px solid #dddddd;
+}
+
+div.history-table-div td,
+div.history-table-div th{
+    white-space:nowrap;
+}

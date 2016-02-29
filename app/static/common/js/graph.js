@@ -18,7 +18,7 @@ function TimeAxis(svg) {
                     return d;
                 })
             ])
-            .range([0, self.parent_svg.node().getBoundingClientRect().width-60]);
+            .range([0, self.parent_svg.node().getBoundingClientRect().width - 60]);
         self.axis_group = d3.select(".svg-root-g")
             .append("g")
             .attr("class", "timeaxis-g")
@@ -316,39 +316,7 @@ function HistoryData() {
             complete: function (data) {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
-                    var table = d3.select(".history-table-div").append("table")
-                        .attr("class", "table table-bordered table-condensed");
-                    var thead = table.append("thead");
-                    var hrow = thead.append("tr");
-                    hrow.append("th")
-                        .attr("class", "text-left")
-                        .html("#");
-                    hrow.append("th")
-                        .attr("class", "text-left")
-                        .html("timestmap");
-                    hrow.append("th")
-                        .attr("class", "text-left")
-                        .html("value");
-                    var tbody = table.append("tbody");
-                    var tr = tbody.selectAll("tr")
-                        .data(self.data_set)
-                        .enter()
-                        .append("tr");
-                    tr.append("td")
-                        .attr("class", "text-left")
-                        .html(function(d, i){
-                            return i;
-                        });
-                    tr.append("td")
-                        .attr("class", "text-left")
-                        .html(function (d) {
-                            return d.timestamp;
-                        });
-                    tr.append("td")
-                        .attr("class", "text-left")
-                        .html(function (d) {
-                            return d.sensors.AN1.value;
-                        });
+                    self.append_table();
                     self.svg.attr("width", d3.select(".history-graph-div").node().getBoundingClientRect().width);
                     self.timeaxis = new TimeAxis(self.svg);
                     self.timeaxis.init(self.data_set);
@@ -364,6 +332,74 @@ function HistoryData() {
                 }
             }
         })
+    };
+    self.append_table = function () {
+        var table = d3.select(".history-table-div").append("table")
+            .attr("class", "table table-bordered table-condensed");
+        var hrow = table.append("thead")
+            .append("tr");
+        hrow.append("th")
+            .attr("class", "text-left")
+            .html("日期时间");
+        hrow.append("th")
+            .attr("class", "text-left")
+            .html(self.data_set[0].sensors.AN1.label);
+        hrow.append("th")
+            .attr("class", "text-left")
+            .html(self.data_set[0].sensors.AN2.label);
+        hrow.append("th")
+            .attr("class", "text-left")
+            .html(self.data_set[0].sensors.AN3.label);
+        hrow.append("th")
+            .attr("class", "text-left")
+            .html(self.data_set[0].sensors.AN4.label);
+        hrow.append("th")
+            .attr("class", "text-left")
+            .html(self.data_set[0].sensors.AN5.label);
+        hrow.append("th")
+            .attr("class", "text-left")
+            .html(self.data_set[0].sensors.AN6.label);
+        var tbody = table.append("tbody");
+        var tr = tbody.selectAll("tr")
+            .data(self.data_set)
+            .enter()
+            .append("tr");
+        tr.append("td")
+            .attr("class", "text-left")
+            .html(function (d) {
+                var date = new Date(d.timestamp);
+                return date.toLocaleString("zh-CN", {hour12: false});
+            });
+        tr.append("td")
+            .attr("class", "text-left")
+            .html(function (d) {
+                return d.sensors.AN1.value;
+            });
+        tr.append("td")
+            .attr("class", "text-left")
+            .html(function (d) {
+                return d.sensors.AN2.value;
+            });
+        tr.append("td")
+            .attr("class", "text-left")
+            .html(function (d) {
+                return d.sensors.AN3.value;
+            });
+        tr.append("td")
+            .attr("class", "text-left")
+            .html(function (d) {
+                return d.sensors.AN4.value;
+            });
+        tr.append("td")
+            .attr("class", "text-left")
+            .html(function (d) {
+                return d.sensors.AN5.value;
+            });
+        tr.append("td")
+            .attr("class", "text-left")
+            .html(function (d) {
+                return d.sensors.AN6.value;
+            });
     };
     self.zoomed = function () {
         self.timeaxis.axis_group.call(self.timeaxis.axis);
