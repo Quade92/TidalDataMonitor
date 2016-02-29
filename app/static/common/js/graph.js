@@ -276,13 +276,12 @@ function HistoryData() {
     self.linepaths = null;
     self.data_set = [];
     self.zoom = null;
-    self.container_id = "history-graph-table-div";
-    self.w = d3.select(".history-graph-div").node().getBoundingClientRect().width;
+    self.w = d3.select("#history-graph-div").node().getBoundingClientRect().width;
     self.h = 500;
     self.start_timestamp = null;
     self.end_timestamp = null;
     self.init = function () {
-        self.svg = d3.select(".history-graph-div")
+        self.svg = d3.select("#history-graph-div")
             .append("svg")
             .attr("width", self.w)
             .attr("height", self.h)
@@ -317,7 +316,7 @@ function HistoryData() {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
                     self.append_table();
-                    self.svg.attr("width", d3.select(".history-graph-div").node().getBoundingClientRect().width);
+                    self.svg.attr("width", d3.select("#history-graph-div").node().getBoundingClientRect().width);
                     self.timeaxis = new TimeAxis(self.svg);
                     self.timeaxis.init(self.data_set);
                     self.yaxis = new YAxis(self.svg);
@@ -334,7 +333,10 @@ function HistoryData() {
         })
     };
     self.append_table = function () {
-        var table = d3.select(".history-table-div").append("table")
+        var table = d3.select("#history-table-div")
+            //.append("div")
+            //.attr("class", "panel panel-default")
+            .append("table")
             .attr("class", "table table-bordered table-condensed");
         var hrow = table.append("thead")
             .append("tr");

@@ -8,6 +8,9 @@
     <!-- Custom styles for this template -->
     <link href="../static/common/css/content.css" rel="stylesheet">
     <link href="../static/common/css/signin.css" rel="stylesheet">
+    <script src="../static/libs/jQuery-1.12.0/js/jquery-1.12.0.min.js"></script>
+    <script src="../static/libs/bootstrap-3.3.6/dist/js/bootstrap.min.js"></script>
+    <script src="../static/libs/js.cookie-2.1.0/js/js.cookie-2.1.0.min.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -49,7 +52,7 @@
 
                     <div class="checkbox">
                         <label>
-{#                            TODO: remenber un#}
+                            {#                            TODO: remenber un#}
                             <input type="checkbox" value="remember-me"> 记住我
                         </label>
                     </div>
@@ -60,9 +63,6 @@
             </div>
         </div>
     </div>
-    <script src="../static/libs/jQuery-1.12.0/dist/js/jquery-1.12.0.min.js"></script>
-    <script src="../static/libs/bootstrap-3.3.6/dist/js/bootstrap.min.js"></script>
-    <script src="../static/libs/js.cookie-2.1.0/dist/js/js.cookie-2.1.0.min.js"></script>
     <script src="../static/common/js/signin.js"></script>
     <script>
         registerSigninBtn();
