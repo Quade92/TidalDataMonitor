@@ -317,7 +317,7 @@ function HistoryData() {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
                     var table = d3.select(".history-table-div").append("table")
-                        .attr("class", "table table-bordered");
+                        .attr("class", "table table-bordered table-condensed");
                     var thead = table.append("thead");
                     var hrow = thead.append("tr");
                     hrow.append("th")
