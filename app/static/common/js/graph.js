@@ -316,16 +316,36 @@ function HistoryData() {
             complete: function (data) {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
-                    var tr = d3.select(".history-table-div").append("table")
-                        .selectAll("tr")
+                    var table = d3.select(".history-table-div").append("table")
+                        .attr("class", "table table-bordered");
+                    var thead = table.append("thead");
+                    var hrow = thead.append("tr");
+                    hrow.append("th")
+                        .attr("class", "text-left")
+                        .html("#");
+                    hrow.append("th")
+                        .attr("class", "text-left")
+                        .html("timestmap");
+                    hrow.append("th")
+                        .attr("class", "text-left")
+                        .html("value");
+                    var tbody = table.append("tbody");
+                    var tr = tbody.selectAll("tr")
                         .data(self.data_set)
                         .enter()
                         .append("tr");
                     tr.append("td")
+                        .attr("class", "text-left")
+                        .html(function(d, i){
+                            return i;
+                        });
+                    tr.append("td")
+                        .attr("class", "text-left")
                         .html(function (d) {
                             return d.timestamp;
                         });
                     tr.append("td")
+                        .attr("class", "text-left")
                         .html(function (d) {
                             return d.sensors.AN1.value;
                         });
