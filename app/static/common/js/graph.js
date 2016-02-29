@@ -30,7 +30,20 @@ function TimeAxis(svg) {
             .tickFormat(d3.time.format("%H:%M:%S"));
         self.axis_group.call(self.axis);
     };
-    self.update = function (latest_record) {
+    self.update_date_set = function (date_set) {
+        self.date_set = date_set;
+        self.scale.domain([
+            d3.min(self.date_set, function (d) {
+                return d;
+            }),
+            d3.max(self.date_set, function (d) {
+                return d;
+            })
+        ]);
+        self.axis_group
+            .call(self.axis);
+    };
+    self.update_latest_record = function (latest_record) {
         var latest_date = new Date(latest_record.timestamp);
         self.date_set.unshift(latest_date);
         self.date_set.pop();
@@ -78,7 +91,21 @@ function YAxis(svg) {
             .orient("left");
         self.axis_group.call(self.axis);
     };
-    self.update = function (latest_record) {
+    self.update_value_set = function (value_set) {
+        self.value_set = value_set;
+        self.scale.domain([
+            d3.max(self.value_set, function (d) {
+                return d;
+            }) * 1.1,
+            d3.min(self.value_set, function (d) {
+                return d;
+            }) * 0.9
+        ]);
+        self.axis_group.transition()
+            .duration(500)
+            .call(self.axis);
+    };
+    self.update_latest_record = function (latest_record) {
         var latest_value = latest_record.sensors.AN1.value;
         self.value_set.unshift(latest_value);
         self.value_set.pop();
@@ -105,23 +132,10 @@ function LinePaths(svg) {
     self.cursors = null;
     self.paths = null;
     self.linefunction = null;
-    self.init = function (data_set, timescale, yscale) {
-        self.data_set = data_set.map(function (d) {
-            var json = {};
-            json.date = new Date(d.timestamp);
-            json.value = d.sensors.AN1.value;
-            return json;
-        });
-        self.timescale = timescale;
-        self.yscale = yscale;
-        var linepaths_group = d3.select(".svg-root-g")
-            .append("g")
-            .attr("class", "linepaths-g")
-            .attr("clip-path", "url(#clip)")
-            .attr("transform", "translate(30, 30)");
-        self.paths = linepaths_group.append("path")
-            .attr("class", "datapath");
-        self.cursors = linepaths_group.selectAll("circle")
+    self.update_circle_cursors = function () {
+        d3.selectAll("circle.circle-cursor").remove();
+        self.cursors = d3.select(".linepaths-g")
+            .selectAll("circle")
             .data(self.data_set)
             .enter()
             .append("circle")
@@ -168,6 +182,24 @@ function LinePaths(svg) {
                 d3.select(".rect-cursor-g")
                     .remove();
             });
+    };
+    self.init = function (data_set, timescale, yscale) {
+        self.data_set = data_set.map(function (d) {
+            var json = {};
+            json.date = new Date(d.timestamp);
+            json.value = d.sensors.AN1.value;
+            return json;
+        });
+        self.timescale = timescale;
+        self.yscale = yscale;
+        var linepaths_group = d3.select(".svg-root-g")
+            .append("g")
+            .attr("class", "linepaths-g")
+            .attr("clip-path", "url(#clip)")
+            .attr("transform", "translate(30, 30)");
+        self.paths = linepaths_group.append("path")
+            .attr("class", "datapath");
+        self.update_circle_cursors();
         self.linefunction = d3.svg.line()
             .x(function (d) {
                 return self.timescale(d.date);
@@ -178,7 +210,15 @@ function LinePaths(svg) {
             .interpolate("linear");
         self.paths.attr("d", self.linefunction(self.data_set));
     };
-    self.update = function (data_set, timescale, yscale) {
+    self.update_data_set = function (data_set, timescale, yscale) {
+        self.data_set = data_set;
+        self.timescale = timescale;
+        self.yscale = yscale;
+        self.update_circle_cursors();
+        self.paths
+            .attr("d", self.linefunction(self.data_set));
+    };
+    self.update_latest_record = function (data_set, timescale, yscale) {
         var json = {};
         json.date = new Date(data_set[0].timestamp);
         json.value = data_set[0].sensors.AN1.value;
@@ -218,7 +258,7 @@ function LiveLinegraph() {
         self.fetch_data();
     };
 
-    self.update = function () {
+    self.update_latest_record = function () {
         var basic_auth = btoa(Cookies.get("un") + ":" + Cookies.get("pwd"));
         $.ajax({
                 type: "GET",
@@ -233,9 +273,9 @@ function LiveLinegraph() {
                         if (latest_record.timestamp != self.data_set[0].timestamp) {
                             self.data_set.unshift(latest_record);
                             self.data_set.pop();
-                            self.timeaxis.update(latest_record);
-                            self.yaxis.update(latest_record);
-                            self.linepaths.update(self.data_set, self.timeaxis.scale, self.yaxis.scale);
+                            self.timeaxis.update_latest_record(latest_record);
+                            self.yaxis.update_latest_record(latest_record);
+                            self.linepaths.update_latest_record(self.data_set, self.timeaxis.scale, self.yaxis.scale);
                         }
                     }
                 }
@@ -307,7 +347,7 @@ function HistoryData() {
         var basic_auth = btoa(Cookies.get("un") + ":" + Cookies.get("pwd"));
         $.ajax({
             type: "GET",
-            url: "http://localhost:5000/record-series/"+start_ts+"/"+end_ts,
+            url: "http://localhost:5000/record-series/" + start_ts + "/" + end_ts,
             headers: {
                 "Authorization": "Basic " + basic_auth
             },
@@ -316,6 +356,26 @@ function HistoryData() {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
                     self.update_table();
+                    var date_set = self.data_set.map(function (d) {
+                        return new Date(d.timestamp);
+                    });
+                    var value_set = self.data_set.map(function (d) {
+                        return d.sensors.AN1.value;
+                    });
+                    var data_set = self.data_set.map(function (d) {
+                        var json = {};
+                        json.date = new Date(d.timestamp);
+                        json.value = d.sensors.AN1.value;
+                        return json;
+                    });
+                    self.timeaxis.update_date_set(date_set);
+                    self.yaxis.update_value_set(value_set);
+                    self.linepaths.update_data_set(data_set, self.timeaxis.scale, self.yaxis.scale);
+                    self.zoom = d3.behavior.zoom()
+                        .x(self.timeaxis.scale)
+                        .scaleExtent([1, 5])
+                        .on("zoom", self.zoomed);
+                    d3.select(".rect-zoom-pan").call(self.zoom);
                 }
             }
         })
@@ -349,14 +409,12 @@ function HistoryData() {
             }
         })
     };
-    self.update_table = function(){
+    self.update_table = function () {
         d3.select("#history-table-div").select("table").remove();
         self.append_table();
     };
     self.append_table = function () {
         var table = d3.select("#history-table-div")
-            //.append("div")
-            //.attr("class", "panel panel-default")
             .append("table")
             .attr("class", "table table-bordered table-condensed");
         var hrow = table.append("thead")

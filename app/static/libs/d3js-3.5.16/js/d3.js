@@ -884,7 +884,7 @@
           exitNodes[i] = group[i];
         }
       }
-      enterNodes.update = updateNodes;
+      enterNodes.update_latest_record = updateNodes;
       enterNodes.parentNode = updateNodes.parentNode = exitNodes.parentNode = group.parentNode;
       enter.push(enterNodes);
       update.push(updateNodes);
@@ -1009,7 +1009,7 @@
   d3_selection_enterPrototype.select = function(selector) {
     var subgroups = [], subgroup, subnode, upgroup, group, node;
     for (var j = -1, m = this.length; ++j < m; ) {
-      upgroup = (group = this[j]).update;
+      upgroup = (group = this[j]).update_latest_record;
       subgroups.push(subgroup = []);
       subgroup.parentNode = group.parentNode;
       for (var i = -1, n = group.length; ++i < n; ) {
@@ -1030,7 +1030,7 @@
   function d3_selection_enterInsertBefore(enter) {
     var i0, j0;
     return function(d, i, j) {
-      var group = enter[j].update, n = group.length, node;
+      var group = enter[j].update_latest_record, n = group.length, node;
       if (j != j0) j0 = j, i0 = 0;
       if (i >= i0) i0 = i + 1;
       while (!(node = group[i0]) && ++i0 < n) ;
