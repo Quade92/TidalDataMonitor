@@ -68,9 +68,10 @@ function YAxis(svg) {
     self.axis_group = null;
     self.axis = null;
     self.init = function (data_set) {
-        self.value_set = data_set.map(function (d) {
-            return d.sensors.AN1.value;
-        });
+        //self.value_set = data_set.map(function (d) {
+        //    return d.sensors.AN1.value;
+        //});
+        self.value_set = data_set;
         self.scale = d3.scale.linear()
             .domain([
                 d3.max(self.value_set, function (d) {
@@ -184,13 +185,13 @@ function LinePaths(svg) {
             });
     };
     self.init = function (data_set, timescale, yscale) {
-        self.data_set = data_set.map(function (d) {
-            var json = {};
-            json.date = new Date(d.timestamp);
-            json.value = d.sensors.AN1.value;
-            return json;
-        });
-
+        //self.data_set = data_set.map(function (d) {
+        //    var json = {};
+        //    json.date = new Date(d.timestamp);
+        //    json.value = d.sensors.AN1.value;
+        //    return json;
+        //});
+        self.data_set = data_set;
         self.timescale = timescale;
         self.yscale = yscale;
         var linepaths_group = d3.select(".svg-root-g")
@@ -357,9 +358,9 @@ function HistoryData() {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
                     var channelNO = null;
-                    var channel = channelstring.substring(2,11);
+                    var channel = channelstring.substring(2, 11);
                     for (var i in self.data_set[0].sensors) {
-                        if(self.data_set[0].sensors[i].label==channel){
+                        if (self.data_set[0].sensors[i].label == channel) {
                             channelNO = i;
                         }
                     }
@@ -405,8 +406,21 @@ function HistoryData() {
                     for (var i in self.data_set[0].sensors) {
                         labels.push(self.data_set[0].sensors[i].label);
                     }
+                    for (var j in self.data_set[0].sensors) {
+                        var channel = j;
+                        break;
+                    }
+                    var value_set = self.data_set.map(function (d) {
+                        return d.sensors[channel].value;
+                    });
+                    var path_data_set = self.data_set.map(function (d) {
+                        var json = {};
+                        json.date = new Date(d.timestamp);
+                        json.value = d.sensors[channel].value;
+                        return json;
+                    });
                     d3.select("#channel-dropdown-button")
-                        .html("通道"+labels[0]+"<span class='caret'></span>");
+                        .html("通道" + labels[0] + "<span class='caret'></span>");
                     d3.select("#channel-dropdown-menu")
                         .selectAll("li")
                         .data(labels)
@@ -419,9 +433,9 @@ function HistoryData() {
                     self.timeaxis = new TimeAxis(self.svg);
                     self.timeaxis.init(self.data_set);
                     self.yaxis = new YAxis(self.svg);
-                    self.yaxis.init(self.data_set);
+                    self.yaxis.init(value_set);
                     self.linepaths = new LinePaths(self.svg);
-                    self.linepaths.init(self.data_set, self.timeaxis.scale, self.yaxis.scale);
+                    self.linepaths.init(path_data_set, self.timeaxis.scale, self.yaxis.scale);
                     self.zoom = d3.behavior.zoom()
                         .x(self.timeaxis.scale)
                         .scaleExtent([1, 5])
@@ -462,6 +476,12 @@ function HistoryData() {
         hrow.append("th")
             .attr("class", "text-left")
             .html(self.data_set[0].sensors.AN6.label);
+        hrow.append("th")
+            .attr("class", "text-left")
+            .html(self.data_set[0].sensors.AN7.label);
+        hrow.append("th")
+            .attr("class", "text-left")
+            .html(self.data_set[0].sensors.AN8.label);
         var tbody = table.append("tbody");
         var tr = tbody.selectAll("tr")
             .data(self.data_set)
@@ -502,6 +522,16 @@ function HistoryData() {
             .attr("class", "text-left")
             .html(function (d) {
                 return d.sensors.AN6.value;
+            });
+        tr.append("td")
+            .attr("class", "text-left")
+            .html(function (d) {
+                return d.sensors.AN7.value;
+            });
+        tr.append("td")
+            .attr("class", "text-left")
+            .html(function (d) {
+                return d.sensors.AN8.value;
             });
     };
     self.zoomed = function () {
