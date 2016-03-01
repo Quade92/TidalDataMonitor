@@ -186,12 +186,28 @@ function LinePaths(svg) {
 
 function LiveLinegraph() {
     var self = this;
-    self.container_id = "live-graph-div";
-    self.svg = d3.select("#" + self.container_id)
+    self.w = d3.select("#graph-div").node().getBoundingClientRect().width;
+    self.h = 500;
+    self.svg = d3.select("#graph-div")
         .append("svg")
         .attr("width", self.w)
         .attr("height", self.h)
-        .attr("class", "live-graph-svg");
+        .attr("class", "history-graph-svg");
+    self.svg_group = self.svg.append("g")
+        .attr("class", "svg-root-g");
+    self.svg_group.append("defs").append("clipPath")
+        .attr("id", "clip")
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", -2)// circle-cursor's radius is 1.5
+        .attr("width", self.w - 60)
+        .attr("height", self.h - 60);
+    self.svg_group.append("rect")
+        .attr("class", "rect-zoom-pan")
+        .attr("x", 30)
+        .attr("y", 30)
+        .attr("width", self.w - 60)
+        .attr("height", self.h - 60);
     self.timeaxis = new TimeAxis(self.svg);
     self.yaxis = new YAxis(self.svg);
     self.linepaths = new LinePaths(self.svg);
@@ -246,6 +262,12 @@ function LiveLinegraph() {
             complete: function (data) {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
+                    var labelsd = {};
+                    for (var i in self.data_set[0].sensors) {
+                        labelsd[i] = self.data_set[0].sensors[i].label;
+                    }
+                    self.init_control(labelsd);
+                    self.update_table();
                     var date_set = self.data_set.map(function (d) {
                         return new Date(d.timestamp);
                     });
@@ -264,6 +286,53 @@ function LiveLinegraph() {
                 }
             }
         });
+    };
+    self.init_control = function (labelsd) {
+        var labels = $.map(labelsd, function (ele, key) {
+            return key;
+        });
+        d3.select("#channel-dropdown-button")
+            .html("通道" + labelsd.AN1 + "<span class='caret'></span>");
+        d3.select("#channel-dropdown-menu")
+            .selectAll("li")
+            .data(labels)
+            .enter()
+            .append("li")
+            .html(function (d) {
+                return "<a>通道" + labelsd[d] + "</a>";
+            });
+    };
+    self.update_table = function () {
+        d3.select("#table-div").select("table").remove();
+        var table = d3.select("#table-div")
+            .append("table")
+            .attr("class", "table table-bordered table-condensed");
+        var hrow = table.append("thead")
+            .append("tr");
+        var tr = table.append("tbody")
+            .selectAll("tr")
+            .data(self.data_set)
+            .enter()
+            .append("tr");
+        hrow.append("th")
+            .attr("class", "text-left")
+            .html("日期时间");
+        tr.append("td")
+            .attr("class", "text-left")
+            .html(function (d) {
+                var date = new Date(d.timestamp);
+                return date.toLocaleString("zh-CN", {hour12: false});
+            });
+        for (var chNO = 1; chNO != 9; chNO++) {
+            hrow.append("th")
+                .attr("class", "text-left")
+                .html(self.data_set[0].sensors["AN" + chNO].label);
+            tr.append("td")
+                .attr("class", "text-left")
+                .html(function (d) {
+                    return d.sensors["AN" + chNO].value;
+                });
+        }
     };
 }
 
@@ -314,7 +383,7 @@ function HistoryData() {
                     }
                     self.update_graph_components("AN1");
                     self.update_table();
-                    self.update_control(labelsd);
+                    self.init_control(labelsd);
                     self.zoom
                         .x(self.timeaxis.scale)
                         .scaleExtent([1, 5])
@@ -366,7 +435,7 @@ function HistoryData() {
         self.yaxis.update_value_set(value_set);
         self.linepaths.update_data_set(path_data_set, self.timeaxis.scale, self.yaxis.scale);
     };
-    self.update_control = function (labelsd) {
+    self.init_control = function (labelsd) {
         var labels = $.map(labelsd, function (ele, key) {
             return key;
         });
