@@ -31,7 +31,6 @@
                 <div class="dropdown" id="channel-selection">
                     <button class="btn btn-default dropdown-toggle" type="button" id="channel-dropdown-button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        通道选择
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="channel-dropdown-button" id="channel-dropdown-menu">
@@ -40,11 +39,11 @@
                 <span><button class="btn btn-default" type="submit" id="datetime-btn">提交</button></span>
             </div>
         </div>
-{#        <div class="row monitor-row">#}
-{#            <div class="col-md-7">#}
-{##}
-{#            </div>#}
-{#        </div>#}
+        {#        <div class="row monitor-row">#}
+        {#            <div class="col-md-7">#}
+        {##}
+        {#            </div>#}
+        {#        </div>#}
     </div>
 
     <link rel="stylesheet" href="../static/common/css/graph.css" type="text/css">
@@ -69,6 +68,13 @@
             });
             $("#enddtpicker").on("dp.change", function (e) {
                 $('#startdtpicker').data("DateTimePicker").maxDate(e.date);
+            });
+        });
+    </script>
+    <script>
+        $(function () {
+            $("#channel-dropdown-menu").on("click", "li a",function () {
+                $("#channel-dropdown-button:first-child")[0].childNodes[0].nodeValue=$(this).text();
             });
         });
     </script>

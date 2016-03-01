@@ -398,13 +398,15 @@ function HistoryData() {
                     for (var i in self.data_set[0].sensors) {
                         labels.push(self.data_set[0].sensors[i].label);
                     }
+                    d3.select("#channel-dropdown-button")
+                        .html("通道"+labels[0]+"<span class='caret'></span>");
                     d3.select("#channel-dropdown-menu")
                         .selectAll("li")
                         .data(labels)
                         .enter()
                         .append("li")
                         .html(function (d) {
-                            return "<a>" + d + "</a>";
+                            return "<a>通道" + d + "</a>";
                         });
                     self.svg.attr("width", d3.select("#history-graph-div").node().getBoundingClientRect().width);
                     self.timeaxis = new TimeAxis(self.svg);
