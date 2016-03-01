@@ -344,7 +344,7 @@ function HistoryData() {
             .attr("height", self.h - 60);
         self.fetch_data();
     };
-    self.update = function (start_ts, end_ts) {
+    self.update = function (channelstring, start_ts, end_ts) {
         var basic_auth = btoa(Cookies.get("un") + ":" + Cookies.get("pwd"));
         $.ajax({
             type: "GET",
@@ -356,17 +356,24 @@ function HistoryData() {
             complete: function (data) {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
+                    var channelNO = null;
+                    var channel = channelstring.substring(2,11);
+                    for (var i in self.data_set[0].sensors) {
+                        if(self.data_set[0].sensors[i].label==channel){
+                            channelNO = i;
+                        }
+                    }
                     self.update_table();
                     var date_set = self.data_set.map(function (d) {
                         return new Date(d.timestamp);
                     });
                     var value_set = self.data_set.map(function (d) {
-                        return d.sensors.AN1.value;
+                        return d.sensors[channelNO].value;
                     });
                     var data_set = self.data_set.map(function (d) {
                         var json = {};
                         json.date = new Date(d.timestamp);
-                        json.value = d.sensors.AN1.value;
+                        json.value = d.sensors[channelNO].value;
                         return json;
                     });
                     self.timeaxis.update_date_set(date_set);

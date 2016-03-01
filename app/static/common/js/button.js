@@ -28,7 +28,8 @@ function register_datetime_btn() {
     $("#datetime-btn").click(function (event) {
         var start_ts = $('#startdtpicker').data("DateTimePicker").date().unix() * 1000;
         var end_ts = $("#enddtpicker").data("DateTimePicker").date().unix() * 1000;
+        var channelstr = $("#channel-dropdown-button:first-child")[0].childNodes[0].nodeValue;
         event.preventDefault();
-        graph.update(start_ts, end_ts);
+        graph.update(channelstr, start_ts, end_ts);
     });
 }
