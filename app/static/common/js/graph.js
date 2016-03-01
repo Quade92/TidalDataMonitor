@@ -190,6 +190,7 @@ function LinePaths(svg) {
             json.value = d.sensors.AN1.value;
             return json;
         });
+
         self.timescale = timescale;
         self.yscale = yscale;
         var linepaths_group = d3.select(".svg-root-g")
@@ -393,6 +394,18 @@ function HistoryData() {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
                     self.append_table();
+                    var labels = [];
+                    for (var i in self.data_set[0].sensors) {
+                        labels.push(self.data_set[0].sensors[i].label);
+                    }
+                    d3.select("#channel-dropdown-menu")
+                        .selectAll("li")
+                        .data(labels)
+                        .enter()
+                        .append("li")
+                        .html(function (d) {
+                            return "<a>" + d + "</a>";
+                        });
                     self.svg.attr("width", d3.select("#history-graph-div").node().getBoundingClientRect().width);
                     self.timeaxis = new TimeAxis(self.svg);
                     self.timeaxis.init(self.data_set);
