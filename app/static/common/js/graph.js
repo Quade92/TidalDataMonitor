@@ -26,8 +26,7 @@ function TimeAxis(svg) {
         self.axis_group
             .call(self.axis);
     };
-    self.update_latest_record = function (latest_record) {
-        var latest_date = new Date(latest_record.timestamp);
+    self.update_latest_date = function (latest_date) {
         self.date_set.unshift(latest_date);
         self.date_set.pop();
         self.scale.domain([
@@ -71,8 +70,7 @@ function YAxis(svg) {
             .duration(500)
             .call(self.axis);
     };
-    self.update_latest_record = function (latest_record) {
-        var latest_value = latest_record.sensors.AN1.value;
+    self.update_latest_value = function (latest_value) {
         self.value_set.unshift(latest_value);
         self.value_set.pop();
         self.scale.domain([
@@ -169,12 +167,9 @@ function LinePaths(svg) {
         self.update_circle_cursors();
         self.paths.attr("d", self.linefunction(self.data_set));
     };
-    self.update_latest_record = function (data_set, timescale, yscale) {
-        var json = {};
-        json.date = new Date(data_set[0].timestamp);
-        json.value = data_set[0].sensors.AN1.value;
-        self.data_set.pop();
+    self.update_latest_json = function (json, timescale, yscale) {
         self.data_set.unshift(json);
+        self.data_set.pop();
         self.timescale = timescale;
         self.yscale = yscale;
         self.cursors.data(self.data_set)
@@ -191,21 +186,20 @@ function LinePaths(svg) {
 
 function LiveLinegraph() {
     var self = this;
-    self.svg = null;
-    self.timeaxis = null;
-    self.yaxis = null;
-    self.linepaths = null;
+    self.container_id = "live-graph-div";
+    self.svg = d3.select("#" + self.container_id)
+        .append("svg")
+        .attr("width", self.w)
+        .attr("height", self.h)
+        .attr("class", "live-graph-svg");
+    self.timeaxis = new TimeAxis(self.svg);
+    self.yaxis = new YAxis(self.svg);
+    self.linepaths = new LinePaths(self.svg);
     self.data_set = [];
     self.timespan = 100;
     self.w = 1000;
     self.h = 500;
-    self.container_id = "live-graph-div";
     self.init = function () {
-        self.svg = d3.select("#" + self.container_id)
-            .append("svg")
-            .attr("width", self.w)
-            .attr("height", self.h)
-            .attr("class", "live-graph-svg");
         self.get_latest_data();
     };
 
@@ -222,11 +216,17 @@ function LiveLinegraph() {
                     if (resp["responseJSON"]["err"] == "False") {
                         var latest_record = resp["responseJSON"]["result"];
                         if (latest_record.timestamp != self.data_set[0].timestamp) {
+                            var latest_date = new Date(latest_record.timestamp);
+                            var latest_value = latest_record.sensors.AN1.value;
+                            var latest_json = {
+                                date: latest_date,
+                                value: latest_value
+                            };
                             self.data_set.unshift(latest_record);
                             self.data_set.pop();
-                            self.timeaxis.update_latest_record(latest_record);
-                            self.yaxis.update_latest_record(latest_record);
-                            self.linepaths.update_latest_record(self.data_set, self.timeaxis.scale, self.yaxis.scale);
+                            self.timeaxis.update_latest_date(latest_date);
+                            self.yaxis.update_latest_value(latest_value);
+                            self.linepaths.update_latest_json(latest_json, self.timeaxis.scale, self.yaxis.scale);
                         }
                     }
                 }
@@ -246,12 +246,21 @@ function LiveLinegraph() {
             complete: function (data) {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
-                    self.timeaxis = new TimeAxis(self.svg);
-                    self.timeaxis.update(self.data_set);
-                    self.yaxis = new YAxis(self.svg);
-                    self.yaxis.init(self.data_set);
-                    self.linepaths = new LinePaths(self.svg);
-                    self.linepaths.init(self.data_set, self.timeaxis.scale, self.yaxis.scale);
+                    var date_set = self.data_set.map(function (d) {
+                        return new Date(d.timestamp);
+                    });
+                    var value_set = self.data_set.map(function (d) {
+                        return d.sensors["AN1"].value;
+                    });
+                    var path_data_set = self.data_set.map(function (d) {
+                        var json = {};
+                        json.date = new Date(d.timestamp);
+                        json.value = d.sensors["AN1"].value;
+                        return json;
+                    });
+                    self.timeaxis.update_date_set(date_set);
+                    self.yaxis.update_value_set(value_set);
+                    self.linepaths.update_data_set(path_data_set, self.timeaxis.scale, self.yaxis.scale);
                 }
             }
         });
@@ -260,9 +269,9 @@ function LiveLinegraph() {
 
 function HistoryData() {
     var self = this;
-    self.w = d3.select("#history-graph-div").node().getBoundingClientRect().width;
+    self.w = d3.select("#graph-div").node().getBoundingClientRect().width;
     self.h = 500;
-    self.svg = d3.select("#history-graph-div")
+    self.svg = d3.select("#graph-div")
         .append("svg")
         .attr("width", self.w)
         .attr("height", self.h)
@@ -378,8 +387,8 @@ function HistoryData() {
         $("#enddtpicker").data("DateTimePicker").date(d3.max(date_set));
     };
     self.update_table = function () {
-        d3.select("#history-table-div").select("table").remove();
-        var table = d3.select("#history-table-div")
+        d3.select("#table-div").select("table").remove();
+        var table = d3.select("#table-div")
             .append("table")
             .attr("class", "table table-bordered table-condensed");
         var hrow = table.append("thead")

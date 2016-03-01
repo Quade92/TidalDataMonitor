@@ -5,18 +5,18 @@ body {
     padding: 40px 15px;
 }
 
-div#history-table-div{
+div#table-div{
     height: 500px;
     overflow: auto;
 }
 
-div#history-graph-div{
+div#graph-div{
     border-radius: 5px;
     border: 1px solid #dddddd;
 }
 
-div#history-table-div td,
-div#history-table-div th{
+div#table-div td,
+div#table-div th{
     white-space:nowrap;
 }
 
