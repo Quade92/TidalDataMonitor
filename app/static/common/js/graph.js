@@ -2,34 +2,17 @@ function TimeAxis(svg) {
     var self = this;
     self.parent_svg = svg;
     self.date_set = [];
-    self.scale = null;
-    self.axis_group = null;
-    self.axis = null;
-    self.init = function (data_set) {
-        self.date_set = data_set.map(function (d) {
-            return new Date(d.timestamp);
-        });
-        self.scale = d3.time.scale()
-            .domain([
-                d3.min(self.date_set, function (d) {
-                    return d;
-                }),
-                d3.max(self.date_set, function (d) {
-                    return d;
-                })
-            ])
-            .range([0, self.parent_svg.node().getBoundingClientRect().width - 60]);
-        self.axis_group = d3.select(".svg-root-g")
-            .append("g")
-            .attr("class", "timeaxis-g")
-            .attr("transform", "translate(30, 470)");
-        self.axis = d3.svg.axis()
-            .scale(self.scale)
-            .orient("bottom")
-            .ticks(5)
-            .tickFormat(d3.time.format("%H:%M:%S"));
-        self.axis_group.call(self.axis);
-    };
+    self.scale = d3.time.scale()
+        .range([0, self.parent_svg.node().getBoundingClientRect().width - 60]);
+    self.axis_group = d3.select(".svg-root-g")
+        .append("g")
+        .attr("class", "timeaxis-g")
+        .attr("transform", "translate(30, 470)");
+    self.axis = d3.svg.axis()
+        .scale(self.scale)
+        .orient("bottom")
+        .ticks(5)
+        .tickFormat(d3.time.format("%H:%M:%S"));
     self.update_date_set = function (date_set) {
         self.date_set = date_set;
         self.scale.domain([
@@ -64,34 +47,16 @@ function YAxis(svg) {
     var self = this;
     self.parent_svg = svg;
     self.value_set = [];
-    self.scale = null;
-    self.axis_group = null;
-    self.axis = null;
-    self.init = function (data_set) {
-        //self.value_set = data_set.map(function (d) {
-        //    return d.sensors.AN1.value;
-        //});
-        self.value_set = data_set;
-        self.scale = d3.scale.linear()
-            .domain([
-                d3.max(self.value_set, function (d) {
-                    return d;
-                }) * 1.1,
-                d3.min(self.value_set, function (d) {
-                    return d;
-                }) * 0.9
-            ])
-            .range([0, self.parent_svg.node().getBoundingClientRect().height - 60])
-            .nice();
-        self.axis_group = d3.select(".svg-root-g")
-            .append("g")
-            .attr("class", "yaxis-g")
-            .attr("transform", "translate(30, 30)");
-        self.axis = d3.svg.axis()
-            .scale(self.scale)
-            .orient("left");
-        self.axis_group.call(self.axis);
-    };
+    self.scale = d3.scale.linear()
+        .range([0, self.parent_svg.node().getBoundingClientRect().height - 60])
+        .nice();
+    self.axis_group = d3.select(".svg-root-g")
+        .append("g")
+        .attr("class", "yaxis-g")
+        .attr("transform", "translate(30, 30)");
+    self.axis = d3.svg.axis()
+        .scale(self.scale)
+        .orient("left");
     self.update_value_set = function (value_set) {
         self.value_set = value_set;
         self.scale.domain([
@@ -131,8 +96,21 @@ function LinePaths(svg) {
     self.yscale = null;
     self.data_set = [];
     self.cursors = null;
-    self.paths = null;
-    self.linefunction = null;
+    self.linefunction = d3.svg.line()
+        .x(function (d) {
+            return self.timescale(d.date);
+        })
+        .y(function (d) {
+            return self.yscale(d.value);
+        })
+        .interpolate("linear");
+    self.linepaths_group = d3.select(".svg-root-g")
+        .append("g")
+        .attr("class", "linepaths-g")
+        .attr("clip-path", "url(#clip)")
+        .attr("transform", "translate(30, 30)");
+    self.paths = self.linepaths_group.append("path")
+        .attr("class", "datapath");
     self.update_circle_cursors = function () {
         d3.selectAll("circle.circle-cursor").remove();
         self.cursors = d3.select(".linepaths-g")
@@ -184,41 +162,12 @@ function LinePaths(svg) {
                     .remove();
             });
     };
-    self.init = function (data_set, timescale, yscale) {
-        //self.data_set = data_set.map(function (d) {
-        //    var json = {};
-        //    json.date = new Date(d.timestamp);
-        //    json.value = d.sensors.AN1.value;
-        //    return json;
-        //});
-        self.data_set = data_set;
-        self.timescale = timescale;
-        self.yscale = yscale;
-        var linepaths_group = d3.select(".svg-root-g")
-            .append("g")
-            .attr("class", "linepaths-g")
-            .attr("clip-path", "url(#clip)")
-            .attr("transform", "translate(30, 30)");
-        self.paths = linepaths_group.append("path")
-            .attr("class", "datapath");
-        self.update_circle_cursors();
-        self.linefunction = d3.svg.line()
-            .x(function (d) {
-                return self.timescale(d.date);
-            })
-            .y(function (d) {
-                return self.yscale(d.value);
-            })
-            .interpolate("linear");
-        self.paths.attr("d", self.linefunction(self.data_set));
-    };
     self.update_data_set = function (data_set, timescale, yscale) {
         self.data_set = data_set;
         self.timescale = timescale;
         self.yscale = yscale;
         self.update_circle_cursors();
-        self.paths
-            .attr("d", self.linefunction(self.data_set));
+        self.paths.attr("d", self.linefunction(self.data_set));
     };
     self.update_latest_record = function (data_set, timescale, yscale) {
         var json = {};
@@ -257,7 +206,7 @@ function LiveLinegraph() {
             .attr("width", self.w)
             .attr("height", self.h)
             .attr("class", "live-graph-svg");
-        self.fetch_data();
+        self.get_latest_data();
     };
 
     self.update_latest_record = function () {
@@ -282,10 +231,10 @@ function LiveLinegraph() {
                     }
                 }
             }
-        )
+        );
     };
 
-    self.fetch_data = function () {
+    self.get_latest_data = function () {
         var basic_auth = btoa(Cookies.get("un") + ":" + Cookies.get("pwd"));
         $.ajax({
             type: "GET",
@@ -298,52 +247,73 @@ function LiveLinegraph() {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
                     self.timeaxis = new TimeAxis(self.svg);
-                    self.timeaxis.init(self.data_set);
+                    self.timeaxis.update(self.data_set);
                     self.yaxis = new YAxis(self.svg);
                     self.yaxis.init(self.data_set);
                     self.linepaths = new LinePaths(self.svg);
                     self.linepaths.init(self.data_set, self.timeaxis.scale, self.yaxis.scale);
                 }
             }
-        })
+        });
     };
 }
 
 function HistoryData() {
     var self = this;
-    self.svg = null;
-    self.svg_group = null;
-    self.timeaxis = null;
-    self.yaxis = null;
-    self.linepaths = null;
-    self.data_set = [];
-    self.zoom = null;
     self.w = d3.select("#history-graph-div").node().getBoundingClientRect().width;
     self.h = 500;
-    self.start_timestamp = null;
-    self.end_timestamp = null;
+    self.svg = d3.select("#history-graph-div")
+        .append("svg")
+        .attr("width", self.w)
+        .attr("height", self.h)
+        .attr("class", "history-graph-svg");
+    self.svg_group = self.svg.append("g")
+        .attr("class", "svg-root-g");
+    self.svg_group.append("defs").append("clipPath")
+        .attr("id", "clip")
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", -2)// circle-cursor's radius is 1.5
+        .attr("width", self.w - 60)
+        .attr("height", self.h - 60);
+    self.svg_group.append("rect")
+        .attr("class", "rect-zoom-pan")
+        .attr("x", 30)
+        .attr("y", 30)
+        .attr("width", self.w - 60)
+        .attr("height", self.h - 60);
+    self.timeaxis = new TimeAxis(self.svg);
+    self.yaxis = new YAxis(self.svg);
+    self.linepaths = new LinePaths(self.svg);
+    self.data_set = [];
+    self.zoom = d3.behavior.zoom();
     self.init = function () {
-        self.svg = d3.select("#history-graph-div")
-            .append("svg")
-            .attr("width", self.w)
-            .attr("height", self.h)
-            .attr("class", "history-graph-svg");
-        self.svg_group = self.svg.append("g")
-            .attr("class", "svg-root-g");
-        self.svg_group.append("defs").append("clipPath")
-            .attr("id", "clip")
-            .append("rect")
-            .attr("x", 0)
-            .attr("y", -2)// circle-cursor's radius is 1.5
-            .attr("width", self.w - 60)
-            .attr("height", self.h - 60);
-        self.svg_group.append("rect")
-            .attr("class", "rect-zoom-pan")
-            .attr("x", 30)
-            .attr("y", 30)
-            .attr("width", self.w - 60)
-            .attr("height", self.h - 60);
-        self.fetch_data();
+        var basic_auth = btoa(Cookies.get("un") + ":" + Cookies.get("pwd"));
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:5000/latest-record-set/600",
+            headers: {
+                "Authorization": "Basic " + basic_auth
+            },
+            dataType: "json",
+            complete: function (data) {
+                if (data["responseJSON"]["err"] == "False") {
+                    self.data_set = data["responseJSON"]["result"];
+                    var labelsd = {};
+                    for (var i in self.data_set[0].sensors) {
+                        labelsd[i] = self.data_set[0].sensors[i].label;
+                    }
+                    self.update_graph_components("AN1");
+                    self.update_table();
+                    self.update_control(labelsd);
+                    self.zoom
+                        .x(self.timeaxis.scale)
+                        .scaleExtent([1, 5])
+                        .on("zoom", self.zoomed);
+                    d3.select(".rect-zoom-pan").call(self.zoom);
+                }
+            }
+        })
     };
     self.update = function (channelstring, start_ts, end_ts) {
         var basic_auth = btoa(Cookies.get("un") + ":" + Cookies.get("pwd"));
@@ -364,175 +334,80 @@ function HistoryData() {
                             channelNO = i;
                         }
                     }
+                    self.update_graph_components(channelNO);
                     self.update_table();
-                    var date_set = self.data_set.map(function (d) {
-                        return new Date(d.timestamp);
-                    });
-                    var value_set = self.data_set.map(function (d) {
-                        return d.sensors[channelNO].value;
-                    });
-                    var data_set = self.data_set.map(function (d) {
-                        var json = {};
-                        json.date = new Date(d.timestamp);
-                        json.value = d.sensors[channelNO].value;
-                        return json;
-                    });
-                    self.timeaxis.update_date_set(date_set);
-                    self.yaxis.update_value_set(value_set);
-                    self.linepaths.update_data_set(data_set, self.timeaxis.scale, self.yaxis.scale);
-                    self.zoom = d3.behavior.zoom()
-                        .x(self.timeaxis.scale)
-                        .scaleExtent([1, 5])
-                        .on("zoom", self.zoomed);
-                    d3.select(".rect-zoom-pan").call(self.zoom);
                 }
             }
         })
     };
-    self.fetch_data = function () {
-        var basic_auth = btoa(Cookies.get("un") + ":" + Cookies.get("pwd"));
-        $.ajax({
-            type: "GET",
-            url: "http://localhost:5000/latest-record-set/600",
-            headers: {
-                "Authorization": "Basic " + basic_auth
-            },
-            dataType: "json",
-            complete: function (data) {
-                if (data["responseJSON"]["err"] == "False") {
-                    self.data_set = data["responseJSON"]["result"];
-                    self.append_table();
-                    var labels = [];
-                    for (var i in self.data_set[0].sensors) {
-                        labels.push(self.data_set[0].sensors[i].label);
-                    }
-                    for (var j in self.data_set[0].sensors) {
-                        var channel = j;
-                        break;
-                    }
-                    var value_set = self.data_set.map(function (d) {
-                        return d.sensors[channel].value;
-                    });
-                    var path_data_set = self.data_set.map(function (d) {
-                        var json = {};
-                        json.date = new Date(d.timestamp);
-                        json.value = d.sensors[channel].value;
-                        return json;
-                    });
-                    d3.select("#channel-dropdown-button")
-                        .html("通道" + labels[0] + "<span class='caret'></span>");
-                    d3.select("#channel-dropdown-menu")
-                        .selectAll("li")
-                        .data(labels)
-                        .enter()
-                        .append("li")
-                        .html(function (d) {
-                            return "<a>通道" + d + "</a>";
-                        });
-                    self.svg.attr("width", d3.select("#history-graph-div").node().getBoundingClientRect().width);
-                    self.timeaxis = new TimeAxis(self.svg);
-                    self.timeaxis.init(self.data_set);
-                    self.yaxis = new YAxis(self.svg);
-                    self.yaxis.init(value_set);
-                    self.linepaths = new LinePaths(self.svg);
-                    self.linepaths.init(path_data_set, self.timeaxis.scale, self.yaxis.scale);
-                    self.zoom = d3.behavior.zoom()
-                        .x(self.timeaxis.scale)
-                        .scaleExtent([1, 5])
-                        .on("zoom", self.zoomed);
-                    d3.select(".rect-zoom-pan").call(self.zoom);
-                }
-            }
-        })
+    self.update_graph_components = function (chNO) {
+        var date_set = self.data_set.map(function (d) {
+            return new Date(d.timestamp);
+        });
+        var value_set = self.data_set.map(function (d) {
+            return d.sensors[chNO].value;
+        });
+        var path_data_set = self.data_set.map(function (d) {
+            var json = {};
+            json.date = new Date(d.timestamp);
+            json.value = d.sensors[chNO].value;
+            return json;
+        });
+        self.timeaxis.update_date_set(date_set);
+        self.yaxis.update_value_set(value_set);
+        self.linepaths.update_data_set(path_data_set, self.timeaxis.scale, self.yaxis.scale);
+    };
+    self.update_control = function (labelsd) {
+        var labels = $.map(labelsd, function (ele, key) {
+            return key;
+        });
+        d3.select("#channel-dropdown-button")
+            .html("通道" + labelsd.AN1 + "<span class='caret'></span>");
+        d3.select("#channel-dropdown-menu")
+            .selectAll("li")
+            .data(labels)
+            .enter()
+            .append("li")
+            .html(function (d) {
+                return "<a>通道" + labelsd[d] + "</a>";
+            });
+        var date_set = self.data_set.map(function (d) {
+            return new Date(d.timestamp);
+        });
+        $('#startdtpicker').data("DateTimePicker").date(d3.min(date_set));
+        $("#enddtpicker").data("DateTimePicker").date(d3.max(date_set));
     };
     self.update_table = function () {
         d3.select("#history-table-div").select("table").remove();
-        self.append_table();
-    };
-    self.append_table = function () {
         var table = d3.select("#history-table-div")
             .append("table")
             .attr("class", "table table-bordered table-condensed");
         var hrow = table.append("thead")
             .append("tr");
-        hrow.append("th")
-            .attr("class", "text-left")
-            .html("日期时间");
-        hrow.append("th")
-            .attr("class", "text-left")
-            .html(self.data_set[0].sensors.AN1.label);
-        hrow.append("th")
-            .attr("class", "text-left")
-            .html(self.data_set[0].sensors.AN2.label);
-        hrow.append("th")
-            .attr("class", "text-left")
-            .html(self.data_set[0].sensors.AN3.label);
-        hrow.append("th")
-            .attr("class", "text-left")
-            .html(self.data_set[0].sensors.AN4.label);
-        hrow.append("th")
-            .attr("class", "text-left")
-            .html(self.data_set[0].sensors.AN5.label);
-        hrow.append("th")
-            .attr("class", "text-left")
-            .html(self.data_set[0].sensors.AN6.label);
-        hrow.append("th")
-            .attr("class", "text-left")
-            .html(self.data_set[0].sensors.AN7.label);
-        hrow.append("th")
-            .attr("class", "text-left")
-            .html(self.data_set[0].sensors.AN8.label);
-        var tbody = table.append("tbody");
-        var tr = tbody.selectAll("tr")
+        var tr = table.append("tbody")
+            .selectAll("tr")
             .data(self.data_set)
             .enter()
             .append("tr");
+        hrow.append("th")
+            .attr("class", "text-left")
+            .html("日期时间");
         tr.append("td")
             .attr("class", "text-left")
             .html(function (d) {
                 var date = new Date(d.timestamp);
                 return date.toLocaleString("zh-CN", {hour12: false});
             });
-        tr.append("td")
-            .attr("class", "text-left")
-            .html(function (d) {
-                return d.sensors.AN1.value;
-            });
-        tr.append("td")
-            .attr("class", "text-left")
-            .html(function (d) {
-                return d.sensors.AN2.value;
-            });
-        tr.append("td")
-            .attr("class", "text-left")
-            .html(function (d) {
-                return d.sensors.AN3.value;
-            });
-        tr.append("td")
-            .attr("class", "text-left")
-            .html(function (d) {
-                return d.sensors.AN4.value;
-            });
-        tr.append("td")
-            .attr("class", "text-left")
-            .html(function (d) {
-                return d.sensors.AN5.value;
-            });
-        tr.append("td")
-            .attr("class", "text-left")
-            .html(function (d) {
-                return d.sensors.AN6.value;
-            });
-        tr.append("td")
-            .attr("class", "text-left")
-            .html(function (d) {
-                return d.sensors.AN7.value;
-            });
-        tr.append("td")
-            .attr("class", "text-left")
-            .html(function (d) {
-                return d.sensors.AN8.value;
-            });
+        for (var chNO = 1; chNO != 9; chNO++) {
+            hrow.append("th")
+                .attr("class", "text-left")
+                .html(self.data_set[0].sensors["AN" + chNO].label);
+            tr.append("td")
+                .attr("class", "text-left")
+                .html(function (d) {
+                    return d.sensors["AN" + chNO].value;
+                });
+        }
     };
     self.zoomed = function () {
         self.timeaxis.axis_group.call(self.timeaxis.axis);
