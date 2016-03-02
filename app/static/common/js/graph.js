@@ -215,6 +215,7 @@ function LiveLinegraph() {
     self.timespan = 100;
     self.w = 1000;
     self.h = 500;
+    self.chNO = null;
     self.init = function () {
         self.get_latest_data();
     };
@@ -232,12 +233,11 @@ function LiveLinegraph() {
                         var latest_record = resp["responseJSON"]["result"];
                         if (latest_record.timestamp != self.data_set[0].timestamp) {
                             var labelsd = {};
-                            var chNO = $("#channel-dropdown-button:first-child")[0].childNodes[0].nodeValue.substring(2, 5);
                             for (var i in self.data_set[0].sensors) {
                                 labelsd[i] = self.data_set[0].sensors[i].label;
                             }
                             var latest_date = new Date(latest_record.timestamp);
-                            var latest_value = latest_record.sensors[chNO].value;
+                            var latest_value = latest_record.sensors[self.chNO].value;
                             var latest_json = {
                                 date: latest_date,
                                 value: latest_value
@@ -269,22 +269,22 @@ function LiveLinegraph() {
                     self.data_set = data["responseJSON"]["result"];
                     var labelsd = {};
                     var chNO = $("#channel-dropdown-button:first-child")[0].childNodes[0].nodeValue;
-                    chNO = chNO.indexOf("AN") == -1 ? "AN1" : chNO.substring(2, 5);
+                    self.chNO = chNO.indexOf("AN") == -1 ? "AN1" : chNO.substring(2, 5);
                     for (var i in self.data_set[0].sensors) {
                         labelsd[i] = self.data_set[0].sensors[i].label;
                     }
-                    self.init_control(labelsd, chNO);
+                    self.init_control(labelsd, self.chNO);
                     self.update_table();
                     var date_set = self.data_set.map(function (d) {
                         return new Date(d.timestamp);
                     });
                     var value_set = self.data_set.map(function (d) {
-                        return d.sensors[chNO].value;
+                        return d.sensors[self.chNO].value;
                     });
                     var path_data_set = self.data_set.map(function (d) {
                         var json = {};
                         json.date = new Date(d.timestamp);
-                        json.value = d.sensors[chNO].value;
+                        json.value = d.sensors[self.chNO].value;
                         return json;
                     });
                     self.timeaxis.update_date_set(date_set);

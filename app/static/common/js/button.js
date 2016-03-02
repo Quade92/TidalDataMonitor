@@ -37,6 +37,6 @@ function register_datetime_btn() {
 function register_channel_btn() {
     $("#channel-btn").click(function(event){
         livegraph.init();
-        livegraph.update_latest_record();
+        livegraph.chNO = $("#channel-dropdown-button:first-child")[0].childNodes[0].nodeValue.substring(2,5);
     });
 }
