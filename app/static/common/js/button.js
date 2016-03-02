@@ -33,3 +33,10 @@ function register_datetime_btn() {
         graph.update(channelstr, start_ts, end_ts);
     });
 }
+
+function register_channel_btn() {
+    $("#channel-btn").click(function(event){
+        livegraph.init();
+        livegraph.update_latest_record();
+    });
+}

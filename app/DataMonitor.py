@@ -8,7 +8,7 @@ def hello_world():
     return render_template("index.html")
 
 
-@app.route("/real-time")
+@app.route("/realtime")
 def real_time_graph():
     return render_template("realtime-graph.html")
 
