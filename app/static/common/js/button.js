@@ -28,15 +28,15 @@ function register_datetime_btn() {
     $("#datetime-btn").click(function (event) {
         var start_ts = $('#startdtpicker').data("DateTimePicker").date().unix() * 1000;
         var end_ts = $("#enddtpicker").data("DateTimePicker").date().unix() * 1000;
-        var channelstr = $("#channel-dropdown-button:first-child")[0].childNodes[0].nodeValue;
+        var chNo = $("#channel-dropdown-button:first-child")[0].childNodes[0].nodeValue.split("：")[0].substring(2);
         event.preventDefault();
-        graph.update(channelstr, start_ts, end_ts);
+        graph.update(chNo, start_ts, end_ts);
     });
 }
 
 function register_channel_btn() {
     $("#channel-btn").click(function(event){
+        livegraph.chNO = $("#channel-dropdown-button:first-child")[0].childNodes[0].nodeValue.split("：")[0].substring(2);
         livegraph.init();
-        livegraph.chNO = $("#channel-dropdown-button:first-child")[0].childNodes[0].nodeValue.substring(2,5);
     });
 }

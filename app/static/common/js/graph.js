@@ -3,11 +3,11 @@ function TimeAxis(svg) {
     self.parent_svg = svg;
     self.date_set = [];
     self.scale = d3.time.scale()
-        .range([0, self.parent_svg.node().getBoundingClientRect().width - 60]);
+        .range([0, self.parent_svg.node().getBoundingClientRect().width - 80]);
     self.axis_group = d3.select(".svg-root-g")
         .append("g")
         .attr("class", "timeaxis-g")
-        .attr("transform", "translate(30, 470)");
+        .attr("transform", "translate(50, 470)");
     self.axis = d3.svg.axis()
         .scale(self.scale)
         .orient("bottom")
@@ -52,7 +52,7 @@ function YAxis(svg) {
     self.axis_group = d3.select(".svg-root-g")
         .append("g")
         .attr("class", "yaxis-g")
-        .attr("transform", "translate(30, 30)");
+        .attr("transform", "translate(50, 30)");
     self.axis = d3.svg.axis()
         .scale(self.scale)
         .orient("left");
@@ -106,7 +106,7 @@ function LinePaths(svg) {
         .append("g")
         .attr("class", "linepaths-g")
         .attr("clip-path", "url(#clip)")
-        .attr("transform", "translate(30, 30)");
+        .attr("transform", "translate(50, 30)");
     self.paths = self.linepaths_group.append("path")
         .attr("class", "datapath");
     self.update_circle_cursors = function () {
@@ -129,7 +129,7 @@ function LinePaths(svg) {
                     .attr("fill", "red");
                 self.parent_svg.append("g")
                     .attr("class", "rect-cursor-g")
-                    .attr("transform", "translate(30, 30)")
+                    .attr("transform", "translate(50, 30)")
                     .append("rect")
                     .attr("class", "rect-cursor")
                     .attr("width", 220)
@@ -200,13 +200,13 @@ function LiveLinegraph() {
         .append("rect")
         .attr("x", 0)
         .attr("y", -2)// circle-cursor's radius is 1.5
-        .attr("width", self.w - 60)
+        .attr("width", self.w - 80)
         .attr("height", self.h - 60);
     self.svg_group.append("rect")
         .attr("class", "rect-zoom-pan")
         .attr("x", 30)
         .attr("y", 30)
-        .attr("width", self.w - 60)
+        .attr("width", self.w - 80)
         .attr("height", self.h - 60);
     self.timeaxis = new TimeAxis(self.svg);
     self.yaxis = new YAxis(self.svg);
@@ -233,11 +233,11 @@ function LiveLinegraph() {
                         var latest_record = resp["responseJSON"]["result"];
                         if (latest_record.timestamp != self.data_set[0].timestamp) {
                             var labelsd = {};
-                            for (var i in self.data_set[0].sensors) {
-                                labelsd[i] = self.data_set[0].sensors[i].label;
+                            for (var i in self.data_set[0].channel) {
+                                labelsd[i] = self.data_set[0].channel[i].label;
                             }
                             var latest_date = new Date(latest_record.timestamp);
-                            var latest_value = latest_record.sensors[self.chNO].value;
+                            var latest_value = latest_record.channel[self.chNO].value;
                             var latest_json = {
                                 date: latest_date,
                                 value: latest_value
@@ -269,9 +269,9 @@ function LiveLinegraph() {
                     self.data_set = data["responseJSON"]["result"];
                     var labelsd = {};
                     var chNO = $("#channel-dropdown-button:first-child")[0].childNodes[0].nodeValue;
-                    self.chNO = chNO.indexOf("AN") == -1 ? "AN1" : chNO.substring(2, 5);
-                    for (var i in self.data_set[0].sensors) {
-                        labelsd[i] = self.data_set[0].sensors[i].label;
+                    self.chNO = chNO.indexOf("CH") == -1 ? "CH1" : chNO.split("：")[0].substring(2);
+                    for (var i in self.data_set[0].channel) {
+                        labelsd[i] = self.data_set[0].channel[i].label;
                     }
                     self.init_control(labelsd, self.chNO);
                     self.update_table();
@@ -279,12 +279,12 @@ function LiveLinegraph() {
                         return new Date(d.timestamp);
                     });
                     var value_set = self.data_set.map(function (d) {
-                        return d.sensors[self.chNO].value;
+                        return d.channel[self.chNO].value;
                     });
                     var path_data_set = self.data_set.map(function (d) {
                         var json = {};
                         json.date = new Date(d.timestamp);
-                        json.value = d.sensors[self.chNO].value;
+                        json.value = d.channel[self.chNO].value;
                         return json;
                     });
                     self.timeaxis.update_date_set(date_set);
@@ -295,7 +295,7 @@ function LiveLinegraph() {
         });
     };
     self.init_control = function (labelsd, chNO) {
-        chNO = typeof chNO !== "undefined" ? chNO : "AN1";
+        chNO = typeof chNO !== "undefined" ? chNO : "CH1";
         var labels = $.map(labelsd, function (ele, key) {
             return key;
         });
@@ -331,14 +331,14 @@ function LiveLinegraph() {
                 var date = new Date(d.timestamp);
                 return date.toLocaleString("zh-CN", {hour12: false});
             });
-        for (var chNO = 1; chNO != 9; chNO++) {
+        for (var chNO = 1; chNO != 11; chNO++) {
             hrow.append("th")
                 .attr("class", "text-left")
-                .html(self.data_set[0].sensors["AN" + chNO].label);
+                .html(self.data_set[0].channel["CH" + chNO].label);
             tr.append("td")
                 .attr("class", "text-left")
                 .html(function (d) {
-                    return d.sensors["AN" + chNO].value;
+                    return d.channel["CH" + chNO].value;
                 });
         }
     };
@@ -360,13 +360,13 @@ function HistoryData() {
         .append("rect")
         .attr("x", 0)
         .attr("y", -2)// circle-cursor's radius is 1.5
-        .attr("width", self.w - 60)
+        .attr("width", self.w - 80)
         .attr("height", self.h - 60);
     self.svg_group.append("rect")
         .attr("class", "rect-zoom-pan")
         .attr("x", 30)
         .attr("y", 30)
-        .attr("width", self.w - 60)
+        .attr("width", self.w - 80)
         .attr("height", self.h - 60);
     self.timeaxis = new TimeAxis(self.svg);
     self.yaxis = new YAxis(self.svg);
@@ -386,10 +386,10 @@ function HistoryData() {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
                     var labelsd = {};
-                    for (var i in self.data_set[0].sensors) {
-                        labelsd[i] = self.data_set[0].sensors[i].label;
+                    for (var i in self.data_set[0].channel) {
+                        labelsd[i] = self.data_set[0].channel[i].label;
                     }
-                    self.update_graph_components("AN1");
+                    self.update_graph_components("CH1");
                     self.update_table();
                     self.init_control(labelsd);
                     self.zoom
@@ -401,7 +401,7 @@ function HistoryData() {
             }
         })
     };
-    self.update = function (channelstring, start_ts, end_ts) {
+    self.update = function (chNo, start_ts, end_ts) {
         var basic_auth = btoa(Cookies.get("un") + ":" + Cookies.get("pwd"));
         $.ajax({
             type: "GET",
@@ -413,8 +413,8 @@ function HistoryData() {
             complete: function (data) {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
-                    var chNO = channelstring.substring(2, 5);
-                    self.update_graph_components(chNO);
+                    //var chNO = channelstring.substring(2, 5);
+                    self.update_graph_components(chNo);
                     self.update_table();
                 }
             }
@@ -425,12 +425,12 @@ function HistoryData() {
             return new Date(d.timestamp);
         });
         var value_set = self.data_set.map(function (d) {
-            return d.sensors[chNO].value;
+            return d.channel[chNO].value;
         });
         var path_data_set = self.data_set.map(function (d) {
             var json = {};
             json.date = new Date(d.timestamp);
-            json.value = d.sensors[chNO].value;
+            json.value = d.channel[chNO].value;
             return json;
         });
         self.timeaxis.update_date_set(date_set);
@@ -442,7 +442,7 @@ function HistoryData() {
             return key;
         });
         d3.select("#channel-dropdown-button")
-            .html("通道AN1：" + labelsd.AN1 + "<span class='caret'></span>");
+            .html("通道CH1：" + labelsd.CH1 + "<span class='caret'></span>");
         d3.select("#channel-dropdown-menu")
             .selectAll("li")
             .data(labels)
@@ -478,14 +478,14 @@ function HistoryData() {
                 var date = new Date(d.timestamp);
                 return date.toLocaleString("zh-CN", {hour12: false});
             });
-        for (var chNO = 1; chNO != 9; chNO++) {
+        for (var chNO = 1; chNO != 11; chNO++) {
             hrow.append("th")
                 .attr("class", "text-left")
-                .html(self.data_set[0].sensors["AN" + chNO].label);
+                .html(self.data_set[0].channel["CH" + chNO].label);
             tr.append("td")
                 .attr("class", "text-left")
                 .html(function (d) {
-                    return d.sensors["AN" + chNO].value;
+                    return d.channel["CH" + chNO].value;
                 });
         }
     };
