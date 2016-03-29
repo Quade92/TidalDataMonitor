@@ -402,7 +402,6 @@ function HistoryData() {
         })
     };
     self.update = function (chNo, start_ts, end_ts) {
-        var basic_auth = btoa(Cookies.get("un") + ":" + Cookies.get("pwd"));
         $.ajax({
             type: "GET",
             url: "http://localhost:5000/record-series/" + start_ts + "/" + end_ts,
@@ -413,7 +412,6 @@ function HistoryData() {
             complete: function (data) {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
-                    //var chNO = channelstring.substring(2, 5);
                     self.update_graph_components(chNo);
                     self.update_table();
                 }
@@ -436,6 +434,10 @@ function HistoryData() {
         self.timeaxis.update_date_set(date_set);
         self.yaxis.update_value_set(value_set);
         self.linepaths.update_data_set(path_data_set, self.timeaxis.scale, self.yaxis.scale);
+        self.zoom
+            .x(self.timeaxis.scale)
+            .scaleExtent([1, 5])
+            .on("zoom", self.zoomed);
     };
     self.init_control = function (labelsd) {
         var labels = $.map(labelsd, function (ele, key) {
