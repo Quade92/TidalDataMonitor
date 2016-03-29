@@ -225,7 +225,7 @@ function LiveLinegraph() {
                 type: "GET",
                 url: "http://localhost:5000/latest-record",
                 headers: {
-                    "Authorization": "Basic " + basic_auth
+                    "Authorization": "Bearer " + Cookies.get("token")
                 },
                 dataType: "json",
                 complete: function (resp) {
@@ -261,7 +261,7 @@ function LiveLinegraph() {
             type: "GET",
             url: "http://localhost:5000/latest-record-set/" + self.timespan,
             headers: {
-                "Authorization": "Basic " + basic_auth
+                "Authorization": "Bearer " + Cookies.get("token")
             },
             dataType: "json",
             complete: function (data) {
@@ -374,12 +374,12 @@ function HistoryData() {
     self.data_set = [];
     self.zoom = d3.behavior.zoom();
     self.init = function () {
-        var basic_auth = btoa(Cookies.get("un") + ":" + Cookies.get("pwd"));
         $.ajax({
             type: "GET",
             url: "http://localhost:5000/latest-record-set/600",
             headers: {
-                "Authorization": "Basic " + basic_auth
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + Cookies.get("token")
             },
             dataType: "json",
             complete: function (data) {
@@ -407,7 +407,7 @@ function HistoryData() {
             type: "GET",
             url: "http://localhost:5000/record-series/" + start_ts + "/" + end_ts,
             headers: {
-                "Authorization": "Basic " + basic_auth
+                "Authorization": "Bearer " + Cookies.get("token")
             },
             dataType: "json",
             complete: function (data) {
