@@ -223,7 +223,7 @@ function LiveLinegraph() {
         var basic_auth = btoa(Cookies.get("un") + ":" + Cookies.get("pwd"));
         $.ajax({
                 type: "GET",
-                url: "http://localhost:5000/latest-record",
+                url: "http://123.56.80.4:5000/latest-record",
                 headers: {
                     "Authorization": "Bearer " + Cookies.get("token")
                 },
@@ -259,7 +259,7 @@ function LiveLinegraph() {
         var basic_auth = btoa(Cookies.get("un") + ":" + Cookies.get("pwd"));
         $.ajax({
             type: "GET",
-            url: "http://localhost:5000/latest-record-set/" + self.timespan,
+            url: "http://123.56.80.4:5000/latest-record-set/" + self.timespan,
             headers: {
                 "Authorization": "Bearer " + Cookies.get("token")
             },
@@ -376,7 +376,7 @@ function HistoryData() {
     self.init = function () {
         $.ajax({
             type: "GET",
-            url: "http://localhost:5000/latest-record-set/600",
+            url: "http://123.56.80.4:5000/latest-record-set/600",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + Cookies.get("token")
@@ -404,7 +404,7 @@ function HistoryData() {
     self.update = function (chNo, start_ts, end_ts) {
         $.ajax({
             type: "GET",
-            url: "http://localhost:5000/record-series/" + start_ts + "/" + end_ts,
+            url: "http://123.56.80.4:5000/record-series/" + start_ts + "/" + end_ts,
             headers: {
                 "Authorization": "Bearer " + Cookies.get("token")
             },
