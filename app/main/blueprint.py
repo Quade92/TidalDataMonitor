@@ -9,6 +9,7 @@ def realtime_graph():
 
 
 @profile.route("/index")
+@profile.route("/")
 def index():
     return flask.render_template("index.html")
 
