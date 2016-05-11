@@ -47,7 +47,7 @@ function YAxis(svg) {
     self.parent_svg = svg;
     self.value_set = [];
     self.scale = d3.scale.linear()
-        .range([0, self.parent_svg.node().getBoundingClientRect().height - 60])
+        .range([10, self.parent_svg.node().getBoundingClientRect().height - 50])
         .nice();
     self.axis_group = d3.select(".svg-root-g")
         .append("g")
@@ -61,10 +61,14 @@ function YAxis(svg) {
         self.scale.domain([
             d3.max(self.value_set, function (d) {
                 return d;
-            }) * 1.1,
+            }) + 0.1*Math.abs(d3.max(self.value_set, function (d) {
+                return d;
+            })),
             d3.min(self.value_set, function (d) {
                 return d;
-            }) * 0.9
+            }) - 0.1*Math.abs(d3.min(self.value_set, function (d) {
+                return d;
+            }))
         ]);
         self.axis_group.transition()
             .duration(500)
@@ -76,10 +80,14 @@ function YAxis(svg) {
         self.scale.domain([
             d3.max(self.value_set, function (d) {
                 return d;
-            }) * 1.1,
+            }) + 0.1*Math.abs(d3.max(self.value_set, function (d) {
+                return d;
+            })),
             d3.min(self.value_set, function (d) {
                 return d;
-            }) * 0.9
+            }) - 0.1*Math.abs(d3.min(self.value_set, function (d) {
+                return d;
+            }))
         ]);
         self.axis_group.transition()
             .duration(500)
