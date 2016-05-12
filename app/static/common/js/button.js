@@ -5,7 +5,7 @@ function register_signin_btn() {
         event.preventDefault();
         $.ajax({
             type: "POST",
-            url: "http://123.56.80.4:5000/authenticate",
+            url: "http://localhost:5000/authenticate",
             headers:{
                 "Content-Type": "application/json"
             },
