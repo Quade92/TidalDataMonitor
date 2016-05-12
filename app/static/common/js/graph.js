@@ -61,12 +61,12 @@ function YAxis(svg) {
         self.scale.domain([
             d3.max(self.value_set, function (d) {
                 return d;
-            }) + 0.1*Math.abs(d3.max(self.value_set, function (d) {
+            }) + 0.1 * Math.abs(d3.max(self.value_set, function (d) {
                 return d;
             })),
             d3.min(self.value_set, function (d) {
                 return d;
-            }) - 0.1*Math.abs(d3.min(self.value_set, function (d) {
+            }) - 0.1 * Math.abs(d3.min(self.value_set, function (d) {
                 return d;
             }))
         ]);
@@ -80,12 +80,12 @@ function YAxis(svg) {
         self.scale.domain([
             d3.max(self.value_set, function (d) {
                 return d;
-            }) + 0.1*Math.abs(d3.max(self.value_set, function (d) {
+            }) + 0.1 * Math.abs(d3.max(self.value_set, function (d) {
                 return d;
             })),
             d3.min(self.value_set, function (d) {
                 return d;
-            }) - 0.1*Math.abs(d3.min(self.value_set, function (d) {
+            }) - 0.1 * Math.abs(d3.min(self.value_set, function (d) {
                 return d;
             }))
         ]);
@@ -381,6 +381,7 @@ function HistoryData() {
     self.linepaths = new LinePaths(self.svg);
     self.data_set = [];
     self.zoom = d3.behavior.zoom();
+    self.data_span = 600;
     self.init = function () {
         $.ajax({
             type: "GET",
@@ -419,7 +420,14 @@ function HistoryData() {
             dataType: "json",
             complete: function (data) {
                 if (data["responseJSON"]["err"] == "False") {
-                    self.data_set = data["responseJSON"]["result"];
+                    if (data["responseJSON"]["result"].length > 600) {
+                        self.data_set = data["responseJSON"]["result"].filter(function (e, i, arr) {
+                            return i % Math.floor(arr.length / 600) == 0;
+                        });
+                    }
+                    else{
+                        self.data_set = data["responseJSON"]["result"];
+                    }
                     self.update_graph_components(chNo);
                     self.update_table();
                 }
