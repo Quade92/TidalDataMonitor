@@ -13,11 +13,11 @@ function TimeAxis(svg) {
         .orient("bottom")
         .ticks(5)
         .tickFormat(d3.time.format("%H:%M:%S"));
-    self.axis_label = self.axis_group.append("test")
+    self.axis_label = self.axis_group.append("text")
         .attr("class", "timeaxis label")
-        .attr("text-anchor", "end")
-        .attr("x", 0)
-        .attr("y", 0)
+        .attr("text-anchor", "middle")
+        .attr("x", $(".history-graph-svg")[0].getBoundingClientRect().width - 70)
+        .attr("y", 20)
         .text("时间");
     self.update_date_set = function (date_set) {
         self.date_set = date_set;
@@ -62,6 +62,14 @@ function YAxis(svg) {
     self.axis = d3.svg.axis()
         .scale(self.scale)
         .orient("left");
+    self.axis_label = self.axis_group.append("text")
+        .attr("class", "yaxis label")
+        .attr("text-anchor", "middle")
+        .attr("x", 30)
+        .attr("y", 0);
+    self.update_label = function(str) {
+        self.axis_label.text(str);
+    };
     self.update_value_set = function (value_set) {
         self.value_set = value_set;
         self.scale.domain([
@@ -278,6 +286,7 @@ function LiveLinegraph() {
                             for (var i in self.data_set[0].channel) {
                                 labelsd[i] = self.data_set[0].channel[i].label;
                             }
+                            self.yaxis.update_label(labelsd[self.chNO]);
                             var latest_date = new Date(latest_record.timestamp);
                             var latest_value = latest_record.channel[self.chNO].value;
                             var latest_json = {
@@ -315,6 +324,7 @@ function LiveLinegraph() {
                     for (var i in self.data_set[0].channel) {
                         labelsd[i] = self.data_set[0].channel[i].label;
                     }
+                    self.yaxis.update_label(labelsd[self.chNO]);
                     self.init_control(labelsd, self.chNO);
                     self.update_table();
                     var date_set = self.data_set.map(function (d) {
@@ -392,7 +402,7 @@ function HistoryData() {
     self.h = 500;
     self.svg = d3.select("#graph-div")
         .append("svg")
-        .attr("width", self.w)
+        .attr("width", self.w -20)
         .attr("height", self.h)
         .attr("class", "history-graph-svg");
     self.svg_group = self.svg.append("g")
@@ -432,6 +442,7 @@ function HistoryData() {
                     for (var i in self.data_set[0].channel) {
                         labelsd[i] = self.data_set[0].channel[i].label;
                     }
+                    self.yaxis.update_label(labelsd["CH1"]);
                     self.update_graph_components("CH1");
                     self.update_table();
                     self.init_control(labelsd);
@@ -462,6 +473,7 @@ function HistoryData() {
                     else {
                         self.data_set = data["responseJSON"]["result"];
                     }
+                    self.yaxis.update_label(labelsd[chNO]);
                     self.update_graph_components(chNo);
                     self.update_table();
                 }
