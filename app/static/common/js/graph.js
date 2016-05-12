@@ -13,6 +13,12 @@ function TimeAxis(svg) {
         .orient("bottom")
         .ticks(5)
         .tickFormat(d3.time.format("%H:%M:%S"));
+    self.axis_label = self.axis_group.append("test")
+        .attr("class", "timeaxis label")
+        .attr("text-anchor", "end")
+        .attr("x", 0)
+        .attr("y", 0)
+        .text("时间");
     self.update_date_set = function (date_set) {
         self.date_set = date_set;
         self.scale.domain([
@@ -144,18 +150,46 @@ function LinePaths(svg) {
                     .attr("height", 50)
                     .attr("rx", 15)
                     .attr("ry", 15)
-                    .attr("x", self.timescale(d.date) + 10)
+                    .attr("x", function () {
+                        if (self.timescale(d.date) > $(".history-graph-svg")[0].getBoundingClientRect().width / 5 * 3) {
+                            return self.timescale(d.date) - 230;
+                        }
+                        else {
+                            return self.timescale(d.date) + 10;
+                        }
+                    })
                     .attr("y", self.yscale(d.value) - 20);
                 d3.select(".rect-cursor-g").append("text")
                     .attr("class", "text-cursor")
-                    .attr("x", self.timescale(d.date))
+                    .attr("x", function () {
+                        if (self.timescale(d.date) > $(".history-graph-svg")[0].getBoundingClientRect().width / 5 * 3) {
+                            return self.timescale(d.date) - 230;
+                        }
+                        else {
+                            return self.timescale(d.date) + 20;
+                        }
+                    })
                     .attr("y", self.yscale(d.value))
                     .append("tspan")
-                    .attr("x", self.timescale(d.date) + 20)
+                    .attr("x", function () {
+                        if (self.timescale(d.date) > $(".history-graph-svg")[0].getBoundingClientRect().width / 5 * 3) {
+                            return self.timescale(d.date) - 220;
+                        }
+                        else {
+                            return self.timescale(d.date) + 20;
+                        }
+                    })
                     .attr("dy", 0)
                     .text("时间: " + d.date.toLocaleString())
                     .append("tspan")
-                    .attr("x", self.timescale(d.date) + 20)
+                    .attr("x", function () {
+                        if (self.timescale(d.date) > $(".history-graph-svg")[0].getBoundingClientRect().width / 5 * 3) {
+                            return self.timescale(d.date) - 220;
+                        }
+                        else {
+                            return self.timescale(d.date) + 20;
+                        }
+                    })
                     .attr("dy", 20)
                     .text("数值: " + d.value);
             })
@@ -198,7 +232,7 @@ function LiveLinegraph() {
     self.h = 500;
     self.svg = d3.select("#graph-div")
         .append("svg")
-        .attr("width", self.w)
+        .attr("width", self.w - 20)
         .attr("height", self.h)
         .attr("class", "history-graph-svg");
     self.svg_group = self.svg.append("g")
@@ -425,7 +459,7 @@ function HistoryData() {
                             return i % Math.floor(arr.length / 600) == 0;
                         });
                     }
-                    else{
+                    else {
                         self.data_set = data["responseJSON"]["result"];
                     }
                     self.update_graph_components(chNo);
