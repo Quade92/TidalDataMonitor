@@ -16,9 +16,13 @@ function register_signin_btn() {
             }),
             complete: function (data) {
                 if (data["responseJSON"]["err"] == "False") {
-                    alert("sign in success!");
+                    alert("登录成功!");
                     window.location.href = "/";
                     Cookies.set("token", data.responseJSON.result.token);
+                }
+                else{
+                    alert("登录失败!");
+                    window.location.href = "/"
                 }
             }
         });

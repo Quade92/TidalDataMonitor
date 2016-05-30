@@ -11,6 +11,16 @@
     <script src="../static/libs/jQuery-1.12.0/js/jquery-1.12.0.min.js"></script>
     <script src="../static/libs/bootstrap-3.3.6/dist/js/bootstrap.min.js"></script>
     <script src="../static/libs/js.cookie-2.1.0/js/js.cookie-2.1.0.min.js"></script>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-danger">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
 {% endblock %}
 
 {% block body %}
@@ -49,13 +59,6 @@
                     <input id="inputUsername" class="form-control" placeholder="用户名" autofocus>
                     <label for="inputPassword" class="sr-only">密码</label>
                     <input id="inputPassword" type="password" class="form-control" placeholder="密码">
-
-{#                    <div class="checkbox">#}
-{#                        <label>#}
-                            {#                            TODO: remenber un#}
-{#                            <input type="checkbox" value="remember-me"> 记住我#}
-{#                        </label>#}
-{#                    </div>#}
                     <button id="signin-submit-btn" class="btn btn-md btn-primary btn-block" type="submit">登录</button>
                     <button class="btn btn-md btn-primary btn-block" data-toggle="modal" data-target="#signinModal">取消
                     </button>
