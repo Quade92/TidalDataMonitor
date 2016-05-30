@@ -5,7 +5,7 @@ function register_signin_btn() {
         event.preventDefault();
         $.ajax({
             type: "POST",
-            url: "http://localhost:5000/authenticate",
+            url: "http://123.56.80.4:5000/authenticate",
             headers:{
                 "Content-Type": "application/json"
             },
@@ -29,7 +29,7 @@ function register_datetime_btn() {
     $("#datetime-btn").click(function (event) {
         var start_ts = $('#startdtpicker').data("DateTimePicker").date().unix() * 1000;
         var end_ts = $("#enddtpicker").data("DateTimePicker").date().unix() * 1000;
-        var chNo = $("#channel-dropdown-button:first-child")[0].childNodes[0].nodeValue.split("：")[0].substring(2);
+        var chNo = $("#gen-A-channel-dropdown-button:first-child")[0].childNodes[0].nodeValue.split("：")[0].substring(2);
         event.preventDefault();
         graph.update(chNo, start_ts, end_ts);
     });
@@ -37,7 +37,7 @@ function register_datetime_btn() {
 
 function register_channel_btn() {
     $("#channel-btn").click(function(event){
-        livegraph.chNO = $("#channel-dropdown-button:first-child")[0].childNodes[0].nodeValue.split("：")[0].substring(2);
+        livegraph.chNO = $("#gen-A-channel-dropdown-button:first-child")[0].childNodes[0].nodeValue.split("：")[0].substring(2);
         livegraph.init();
     });
 }

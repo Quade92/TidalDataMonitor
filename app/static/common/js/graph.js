@@ -72,17 +72,24 @@ function YAxis(svg) {
     };
     self.update_value_set = function (value_set) {
         self.value_set = value_set;
+        // self.scale.domain([
+        //     d3.max(self.value_set, function (d) {
+        //         return d;
+        //     }) + 0.1 * Math.abs(d3.max(self.value_set, function (d) {
+        //         return d;
+        //     })),
+        //     d3.min(self.value_set, function (d) {
+        //         return d;
+        //     }) - 0.1 * Math.abs(d3.min(self.value_set, function (d) {
+        //         return d;
+        //     }))
+        // ]);
         self.scale.domain([
             d3.max(self.value_set, function (d) {
                 return d;
             }) + 0.1 * Math.abs(d3.max(self.value_set, function (d) {
                 return d;
-            })),
-            d3.min(self.value_set, function (d) {
-                return d;
-            }) - 0.1 * Math.abs(d3.min(self.value_set, function (d) {
-                return d;
-            }))
+            })), 0
         ]);
         self.axis_group.transition()
             .duration(500)
@@ -236,9 +243,9 @@ function LinePaths(svg) {
 
 function LiveLinegraph() {
     var self = this;
-    self.w = d3.select("#graph-div").node().getBoundingClientRect().width;
+    self.w = d3.select("#gen-A-graph-div").node().getBoundingClientRect().width;
     self.h = 500;
-    self.svg = d3.select("#graph-div")
+    self.svg = d3.select("#gen-A-graph-div")
         .append("svg")
         .attr("width", self.w - 20)
         .attr("height", self.h)
@@ -270,10 +277,9 @@ function LiveLinegraph() {
         self.get_latest_data();
     };
     self.update_latest_record = function () {
-        var basic_auth = btoa(Cookies.get("un") + ":" + Cookies.get("pwd"));
         $.ajax({
                 type: "GET",
-                url: "http://localhost:5000/latest-record",
+                url: "http://123.56.80.4:5000/latest-record",
                 headers: {
                     "Authorization": "Bearer " + Cookies.get("token")
                 },
@@ -307,10 +313,9 @@ function LiveLinegraph() {
     };
 
     self.get_latest_data = function () {
-        var basic_auth = btoa(Cookies.get("un") + ":" + Cookies.get("pwd"));
         $.ajax({
             type: "GET",
-            url: "http://localhost:5000/latest-record-set/" + self.timespan,
+            url: "http://123.56.80.4:5000/latest-record-set/" + self.timespan,
             headers: {
                 "Authorization": "Bearer " + Cookies.get("token")
             },
@@ -319,7 +324,7 @@ function LiveLinegraph() {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
                     var labelsd = {};
-                    var chNO = $("#channel-dropdown-button:first-child")[0].childNodes[0].nodeValue;
+                    var chNO = $("#gen-A-channel-dropdown-button:first-child")[0].childNodes[0].nodeValue;
                     self.chNO = chNO.indexOf("CH") == -1 ? "CH1" : chNO.split("：")[0].substring(2);
                     for (var i in self.data_set[0].channel) {
                         labelsd[i] = self.data_set[0].channel[i].label;
@@ -351,9 +356,9 @@ function LiveLinegraph() {
         var labels = $.map(labelsd, function (ele, key) {
             return key;
         });
-        d3.select("#channel-dropdown-button")
+        d3.select("#gen-A-channel-dropdown-button")
             .html("通道" + chNO + "：" + labelsd[chNO] + "<span class='caret'></span>");
-        d3.select("#channel-dropdown-menu")
+        d3.select("#gen-A-channel-dropdown-menu")
             .selectAll("li")
             .data(labels)
             .enter()
@@ -398,9 +403,9 @@ function LiveLinegraph() {
 
 function HistoryData() {
     var self = this;
-    self.w = d3.select("#graph-div").node().getBoundingClientRect().width;
+    self.w = d3.select("#gen-A-graph-div").node().getBoundingClientRect().width;
     self.h = 500;
-    self.svg = d3.select("#graph-div")
+    self.svg = d3.select("#gen-A-graph-div")
         .append("svg")
         .attr("width", self.w -20)
         .attr("height", self.h)
@@ -429,7 +434,7 @@ function HistoryData() {
     self.init = function () {
         $.ajax({
             type: "GET",
-            url: "http://localhost:5000/latest-record-set/600",
+            url: "http://123.56.80.4:5000/latest-record-set/600",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + Cookies.get("token")
@@ -458,7 +463,7 @@ function HistoryData() {
     self.update = function (chNo, start_ts, end_ts) {
         $.ajax({
             type: "GET",
-            url: "http://localhost:5000/record-series/" + start_ts + "/" + end_ts,
+            url: "http://123.56.80.4:5000/record-series/" + start_ts + "/" + end_ts,
             headers: {
                 "Authorization": "Bearer " + Cookies.get("token")
             },
@@ -505,9 +510,9 @@ function HistoryData() {
         var labels = $.map(labelsd, function (ele, key) {
             return key;
         });
-        d3.select("#channel-dropdown-button")
+        d3.select("#gen-A-channel-dropdown-button")
             .html("通道CH1：" + labelsd.CH1 + "<span class='caret'></span>");
-        d3.select("#channel-dropdown-menu")
+        d3.select("#gen-A-channel-dropdown-menu")
             .selectAll("li")
             .data(labels)
             .enter()

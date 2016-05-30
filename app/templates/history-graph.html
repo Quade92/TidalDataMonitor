@@ -10,7 +10,6 @@
             <div class="form-inline col-md-10">
                 <div class="form-group">
                     <label for="startdate">开始时间：</label>
-
                     <div class='input-group date' id="startdtpicker">
                         <input type='text' class="form-control" id="startdate"/>
                     <span class="input-group-addon">
@@ -29,11 +28,11 @@
                     </div>
                 </div>
                 <div class="dropdown" id="channel-selection">
-                    <button class="btn btn-default dropdown-toggle" type="button" id="channel-dropdown-button"
+                    <button class="btn btn-default dropdown-toggle" type="button" id="gen-A-channel-dropdown-button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="caret"></span>
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="channel-dropdown-button" id="channel-dropdown-menu">
+                    <ul class="dropdown-menu" aria-labelledby="gen-A-channel-dropdown-button" id="gen-A-channel-dropdown-menu">
                     </ul>
                 </div>
                 <span><button class="btn btn-default" type="submit" id="datetime-btn">提交</button></span>
@@ -68,8 +67,8 @@
     </script>
     <script>
         $(function () {
-            $("#channel-dropdown-menu").on("click", "li a",function () {
-                $("#channel-dropdown-button:first-child")[0].childNodes[0].nodeValue=$(this).text();
+            $("#gen-A-channel-dropdown-menu").on("click", "li a",function () {
+                $("#gen-A-channel-dropdown-button:first-child")[0].childNodes[0].nodeValue=$(this).text();
             });
         });
     </script>
