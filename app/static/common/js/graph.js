@@ -7,7 +7,7 @@ function TimeAxis(svg) {
     self.axis_group = d3.select(".svg-root-g")
         .append("g")
         .attr("class", "timeaxis-g")
-        .attr("transform", "translate(50, 470)");
+        .attr("transform", "translate(50, 510)");
     self.axis = d3.svg.axis()
         .scale(self.scale)
         .orient("bottom")
@@ -16,8 +16,8 @@ function TimeAxis(svg) {
     self.axis_label = self.axis_group.append("text")
         .attr("class", "timeaxis label")
         .attr("text-anchor", "middle")
-        .attr("x", $(".history-graph-svg")[0].getBoundingClientRect().width - 70)
-        .attr("y", 20)
+        .attr("x", $(".history-graph-svg")[0].getBoundingClientRect().width / 2)
+        .attr("y", 35)
         .text("时间");
     self.update_date_set = function (date_set) {
         self.date_set = date_set;
@@ -53,12 +53,12 @@ function YAxis(svg) {
     self.parent_svg = svg;
     self.value_set = [];
     self.scale = d3.scale.linear()
-        .range([10, self.parent_svg.node().getBoundingClientRect().height - 50])
+        .range([10, self.parent_svg.node().getBoundingClientRect().height - 80])
         .nice();
     self.axis_group = d3.select(".svg-root-g")
         .append("g")
         .attr("class", "yaxis-g")
-        .attr("transform", "translate(50, 30)");
+        .attr("transform", "translate(50, 40)");
     self.axis = d3.svg.axis()
         .scale(self.scale)
         .orient("left");
@@ -67,7 +67,7 @@ function YAxis(svg) {
         .attr("text-anchor", "middle")
         .attr("x", 30)
         .attr("y", 0);
-    self.update_label = function(str) {
+    self.update_label = function (str) {
         self.axis_label.text(str);
     };
     self.update_value_set = function (value_set) {
@@ -104,11 +104,12 @@ function YAxis(svg) {
             }) + 0.1 * Math.abs(d3.max(self.value_set, function (d) {
                 return d;
             })),
-            d3.min(self.value_set, function (d) {
-                return d;
-            }) - 0.1 * Math.abs(d3.min(self.value_set, function (d) {
-                return d;
-            }))
+            0
+            // d3.min(self.value_set, function (d) {
+            //     return d;
+            // }) - 0.1 * Math.abs(d3.min(self.value_set, function (d) {
+            //     return d;
+            // }))
         ]);
         self.axis_group.transition()
             .duration(500)
@@ -241,11 +242,12 @@ function LinePaths(svg) {
     };
 }
 
-function LiveLinegraph() {
+function LiveLinegraph(graph_div) {
     var self = this;
-    self.w = d3.select("#gen-A-graph-div").node().getBoundingClientRect().width;
-    self.h = 500;
-    self.svg = d3.select("#gen-A-graph-div")
+    self.graph_div = d3.select(graph_div);
+    self.w = self.graph_div.node().getBoundingClientRect().width;
+    self.h = 550;
+    self.svg = self.graph_div
         .append("svg")
         .attr("width", self.w - 20)
         .attr("height", self.h)
@@ -273,9 +275,6 @@ function LiveLinegraph() {
     self.w = 1000;
     self.h = 500;
     self.chNO = null;
-    self.init = function () {
-        self.get_latest_data();
-    };
     self.update_latest_record = function () {
         $.ajax({
                 type: "GET",
@@ -287,12 +286,21 @@ function LiveLinegraph() {
                 complete: function (resp) {
                     if (resp["responseJSON"]["err"] == "False") {
                         var latest_record = resp["responseJSON"]["result"];
+                        var chNO = $("#gen-A-channel-selection").find(">button")[0].childNodes[0].nodeValue;
+                        chNO = chNO.indexOf("CH") == -1 ? "CH1" : chNO.split("：")[0].substring(2);
+                        d3.select("#gen-A-rtd-label").html(
+                            latest_record["channel"][chNO]["value"].toFixed(2) + latest_record["channel"][chNO]["unit"]
+                        ).style("font-size", "30px");
                         if (latest_record.timestamp != self.data_set[0].timestamp) {
                             var labelsd = {};
                             for (var i in self.data_set[0].channel) {
                                 labelsd[i] = self.data_set[0].channel[i].label;
                             }
-                            self.yaxis.update_label(labelsd[self.chNO]);
+                            var unitsd = {};
+                            for (var j in self.data_set[0].channel) {
+                                unitsd[j] = self.data_set[0].channel[j].unit;
+                            }
+                            self.yaxis.update_label(labelsd[self.chNO] + " / " + unitsd[self.chNO]);
                             var latest_date = new Date(latest_record.timestamp);
                             var latest_value = latest_record.channel[self.chNO].value;
                             var latest_json = {
@@ -301,10 +309,11 @@ function LiveLinegraph() {
                             };
                             self.data_set.unshift(latest_record);
                             self.data_set.pop();
-                            self.update_table();
+                            self.update_table("#table-div");
                             self.timeaxis.update_latest_date(latest_date);
                             self.yaxis.update_latest_value(latest_value);
                             self.linepaths.update_latest_json(latest_json, self.timeaxis.scale, self.yaxis.scale);
+                            // TODO restructure
                         }
                     }
                 }
@@ -312,7 +321,7 @@ function LiveLinegraph() {
         );
     };
 
-    self.get_latest_data = function () {
+    self.get_latest_data = function (channel_selector) {
         $.ajax({
             type: "GET",
             url: "http://123.56.80.4:5000/latest-record-set/" + self.timespan,
@@ -324,14 +333,16 @@ function LiveLinegraph() {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
                     var labelsd = {};
-                    var chNO = $("#gen-A-channel-dropdown-button:first-child")[0].childNodes[0].nodeValue;
+                    // var chNO = $("#gen-A-channel-dropdown-button:first-child")[0].childNodes[0].nodeValue;
+                    var chNO = $(channel_selector + ">button")[0].childNodes[0].nodeValue;
                     self.chNO = chNO.indexOf("CH") == -1 ? "CH1" : chNO.split("：")[0].substring(2);
                     for (var i in self.data_set[0].channel) {
+                        // TODO select label here
                         labelsd[i] = self.data_set[0].channel[i].label;
                     }
                     self.yaxis.update_label(labelsd[self.chNO]);
-                    self.init_control(labelsd, self.chNO);
-                    self.update_table();
+                    self.init_control(labelsd, self.chNO, "#gen-A-channel-selection");
+                    self.update_table("#table-div");
                     var date_set = self.data_set.map(function (d) {
                         return new Date(d.timestamp);
                     });
@@ -351,14 +362,16 @@ function LiveLinegraph() {
             }
         });
     };
-    self.init_control = function (labelsd, chNO) {
+    self.init_control = function (labelsd, chNO, channel_selector) {
         chNO = typeof chNO !== "undefined" ? chNO : "CH1";
         var labels = $.map(labelsd, function (ele, key) {
             return key;
         });
-        d3.select("#gen-A-channel-dropdown-button")
+        // d3.select("#gen-A-channel-dropdown-button")
+        d3.select(channel_selector + ">button")
             .html("通道" + chNO + "：" + labelsd[chNO] + "<span class='caret'></span>");
-        d3.select("#gen-A-channel-dropdown-menu")
+        // d3.select("#gen-A-channel-dropdown-menu")
+        d3.select(channel_selector + ">ul")
             .selectAll("li")
             .data(labels)
             .enter()
@@ -367,9 +380,9 @@ function LiveLinegraph() {
                 return "<a>通道" + d + "：" + labelsd[d] + "</a>";
             });
     };
-    self.update_table = function () {
-        d3.select("#table-div").select("table").remove();
-        var table = d3.select("#table-div")
+    self.update_table = function (table_div) {
+        d3.select(table_div).select("table").remove();
+        var table = d3.select(table_div)
             .append("table")
             .attr("class", "table table-bordered table-condensed");
         var hrow = table.append("thead")
@@ -388,14 +401,14 @@ function LiveLinegraph() {
                 var date = new Date(d.timestamp);
                 return date.toLocaleString("zh-CN", {hour12: false});
             });
-        for (var chNO = 1; chNO != 11; chNO++) {
+        for (var chNO = 1; chNO != 12; chNO++) {
             hrow.append("th")
                 .attr("class", "text-left")
                 .html(self.data_set[0].channel["CH" + chNO].label);
             tr.append("td")
                 .attr("class", "text-left")
                 .html(function (d) {
-                    return d.channel["CH" + chNO].value;
+                    return parseFloat(d.channel["CH" + chNO].value).toFixed(2);
                 });
         }
     };
@@ -404,10 +417,10 @@ function LiveLinegraph() {
 function HistoryData() {
     var self = this;
     self.w = d3.select("#gen-A-graph-div").node().getBoundingClientRect().width;
-    self.h = 500;
+    self.h = 550;
     self.svg = d3.select("#gen-A-graph-div")
         .append("svg")
-        .attr("width", self.w -20)
+        .attr("width", self.w - 20)
         .attr("height", self.h)
         .attr("class", "history-graph-svg");
     self.svg_group = self.svg.append("g")
@@ -443,11 +456,20 @@ function HistoryData() {
             complete: function (data) {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
+                    //var labelsd = {};
+                    //for (var i in self.data_set[0].channel) {
+                    //    labelsd[i] = self.data_set[0].channel[i].label;
+                    //}
+                    //self.yaxis.update_label(labelsd["CH1"]);
                     var labelsd = {};
                     for (var i in self.data_set[0].channel) {
                         labelsd[i] = self.data_set[0].channel[i].label;
                     }
-                    self.yaxis.update_label(labelsd["CH1"]);
+                    var unitsd = {};
+                    for (var j in self.data_set[0].channel) {
+                        unitsd[j] = self.data_set[0].channel[j].unit;
+                    }
+                    self.yaxis.update_label(labelsd["CH1"] + " / " + unitsd["CH1"]);
                     self.update_graph_components("CH1");
                     self.update_table();
                     self.init_control(labelsd);
@@ -478,7 +500,20 @@ function HistoryData() {
                     else {
                         self.data_set = data["responseJSON"]["result"];
                     }
-                    self.yaxis.update_label(labelsd[chNO]);
+                    //var labelsd = {};
+                    //for (var i in self.data_set[0].channel) {
+                    //    labelsd[i] = self.data_set[0].channel[i].label;
+                    //}
+                    //self.yaxis.update_label(labelsd[chNo]);
+                    var labelsd = {};
+                    for (var i in self.data_set[0].channel) {
+                        labelsd[i] = self.data_set[0].channel[i].label;
+                    }
+                    var unitsd = {};
+                    for (var j in self.data_set[0].channel) {
+                        unitsd[j] = self.data_set[0].channel[i].unit;
+                    }
+                    self.yaxis.update_label(labelsd[self.chNO] + " / " + unitsd[self.chNO]);
                     self.update_graph_components(chNo);
                     self.update_table();
                 }
@@ -547,14 +582,14 @@ function HistoryData() {
                 var date = new Date(d.timestamp);
                 return date.toLocaleString("zh-CN", {hour12: false});
             });
-        for (var chNO = 1; chNO != 11; chNO++) {
+        for (var chNO = 1; chNO != 12; chNO++) {
             hrow.append("th")
                 .attr("class", "text-left")
                 .html(self.data_set[0].channel["CH" + chNO].label);
             tr.append("td")
                 .attr("class", "text-left")
                 .html(function (d) {
-                    return d.channel["CH" + chNO].value;
+                    return parseFloat(d.channel["CH" + chNO].value).toFixed(2);
                 });
         }
     };

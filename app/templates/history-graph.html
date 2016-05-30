@@ -4,12 +4,12 @@
     <div class="container-fluid">
         <div id="graph-table" class="row monitor-row">
             <div id="gen-A-graph-div" class="col-md-7 panel panel-default"></div>
-            <div id="table-div" class="col-md-4 col-md-offset-1 panel panel-default"></div>
         </div>
         <div class="row monitor-row">
             <div class="form-inline col-md-10">
                 <div class="form-group">
                     <label for="startdate">开始时间：</label>
+
                     <div class='input-group date' id="startdtpicker">
                         <input type='text' class="form-control" id="startdate"/>
                     <span class="input-group-addon">
@@ -32,11 +32,17 @@
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="caret"></span>
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="gen-A-channel-dropdown-button" id="gen-A-channel-dropdown-menu">
+                    <ul class="dropdown-menu" aria-labelledby="gen-A-channel-dropdown-button"
+                        id="gen-A-channel-dropdown-menu">
                     </ul>
                 </div>
+
                 <span><button class="btn btn-default" type="submit" id="datetime-btn">提交</button></span>
+
             </div>
+        </div>
+        <div class="monitor-row row">
+            <div id="table-div" class="col-md-10 panel panel-default table-responsive"></div>
         </div>
     </div>
 
@@ -67,8 +73,8 @@
     </script>
     <script>
         $(function () {
-            $("#gen-A-channel-dropdown-menu").on("click", "li a",function () {
-                $("#gen-A-channel-dropdown-button:first-child")[0].childNodes[0].nodeValue=$(this).text();
+            $("#gen-A-channel-dropdown-menu").on("click", "li a", function () {
+                $("#gen-A-channel-dropdown-button:first-child")[0].childNodes[0].nodeValue = $(this).text();
             });
         });
     </script>
