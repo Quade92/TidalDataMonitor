@@ -3,42 +3,70 @@
 {% block main_content %}
     <div class="container-fluid">
         <div class="container-fluid">
-        <div id="graph-table" class="row monitor-row">
-            <div id="graph-div" class="col-md-7"></div>
-            <div id="table-div" class="col-md-4 col-md-offset-1 panel panel-default"></div>
-        </div>
-        <div class="row monitor-row">
-            <div class="form-inline col-md-8">
-                <div class="dropdown" id="channel-selection">
-                    <button class="btn btn-default dropdown-toggle" type="button" id="channel-dropdown-button"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="channel-dropdown-button" id="channel-dropdown-menu">
-                    </ul>
+            <div class="row monitor-row">
+                <h3> A路机组数据 </h3>
+                <div id="gen-A-graph-div" class="col-md-7 panel panel-default">
+                    <!-- generator A graph -->
                 </div>
-                <span><button class="btn btn-default" type="submit" id="channel-btn">提交</button></span>
+                <div class="panel panel-default col-md-3 col-md-offset-1">
+                    <div class="panel-body">
+                        <h4>通道选择</h4>
+                        <div class="input-group">
+                            <div class="dropdown" id="gen-A-channel-selection">
+                                <button class="btn btn-default dropdown-toggle" type="button"
+                                        id="gen-A-channel-dropdown-button"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="gen-A-channel-dropdown-button"
+                                    id="gen-A-channel-dropdown-menu">
+                                </ul>
+                                <span><button class="btn btn-default" type="submit" id="channel-btn">提交</button></span>
+                            </div>
+                        </div>
+                        <h4>通道实时值</h4>
+                        <div id="gen-A-rtd-label" class="well">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row monitor-row">
+                <h3> B路机组数据 </h3>
+                <div id="gen-B-graph-div" class="col-md-4 panel panel-default">
+                    <!-- generator B graph -->
+                </div>
+            </div>
+            <div class="row monitor-row">
+                <h3> 共用数据 </h3>
+                <div id="rest-graph-div" class="col-md-4 panel panel-default">
+                    <!-- rest graph -->
+                </div>
+            </div>
+            <div class="row monitor-row">
+                <h3> 数据表格 </h3>
+                <div id="table-div" class="col-md-10 panel panel-default table-responsive">
+                    <!-- data table -->
+                </div>
             </div>
         </div>
-    </div>
 
-    <link rel="stylesheet" href="../static/common/css/graph.css" type="text/css">
-    <script src="../static/libs/d3js-3.5.16/js/d3.min.js"></script>
-    <script src="../static/common/js/button.js"></script>
-    <script src="../static/common/js/graph.js"></script>
-    <script>
-        $(function () {
-            $("#channel-dropdown-menu").on("click", "li a",function () {
-                $("#channel-dropdown-button:first-child")[0].childNodes[0].nodeValue=$(this).text();
+        <link rel="stylesheet" href="../static/common/css/graph.css" type="text/css">
+        <script src="../static/libs/d3js-3.5.16/js/d3.min.js"></script>
+        <script src="../static/common/js/button.js"></script>
+        <script src="../static/common/js/graph.js"></script>
+        <script>
+            $(function () {
+                $("#gen-A-channel-dropdown-menu").on("click", "li a", function () {
+                    $("#gen-A-channel-dropdown-button:first-child")[0].childNodes[0].nodeValue = $(this).text();
+                });
             });
-        });
-    </script>
-    <script>
-        var livegraph = new LiveLinegraph();
-        livegraph.init();
-        setInterval(function () {
-            livegraph.update_latest_record();
-        }, 800);
-        register_channel_btn();
-    </script>
+        </script>
+        <script>
+            var livegraph = new LiveLinegraph();
+            livegraph.init();
+            setInterval(function () {
+                livegraph.update_latest_record();
+            }, 800);
+            register_channel_btn();
+        </script>
 {% endblock %}
