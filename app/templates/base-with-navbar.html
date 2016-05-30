@@ -12,7 +12,7 @@
     <script src="../static/libs/bootstrap-3.3.6/dist/js/bootstrap.min.js"></script>
     <script src="../static/libs/js.cookie-2.1.0/js/js.cookie-2.1.0.min.js"></script>
 
-    {% with messages = get_flashed_messages() %}
+    {% with messages = get_flashed_messages(category_filter=["error"]) %}
         {% if messages %}
             <div class="alert alert-danger">
                 {% for message in messages %}
@@ -27,16 +27,20 @@
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
-                <a class="navbar-brand" href="index">潮流能发电装置监测预测平台</a>
+                <a class="navbar-brand" href="{{ url_for("profile.index") }}">潮流能发电装置监测预测平台</a>
             </div>
             <div id="navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="index">主页</a></li>
-                    <li><a href="realtime">实时数据</a></li>
-                    <li><a href="history">历史数据</a></li>
+                    <li><a href="{{ url_for("profile.index") }}">主页</a></li>
+                    <li><a href="{{ url_for("profile.realtime") }}">实时数据</a></li>
+                    <li><a href="{{ url_for("profile.history") }}">历史数据</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#" id="signin-flyout-btn" data-toggle="modal" data-target="#signinModal">登录</a></li>
+                    {% if not session.un %}
+                        <li><a href="#" id="signin-flyout-btn" data-toggle="modal" data-target="#signinModal">登录</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for("profile.logout") }}" id="signin-flyout-btn">你好，{{ session.un }}。退出登录</a></li>
+                    {% endif %}
                 </ul>
             </div>
         </div>

@@ -18,6 +18,7 @@ function register_signin_btn() {
                 if (data["responseJSON"]["err"] == "False") {
                     alert("登录成功!");
                     window.location.href = "/";
+                    Cookies.set("un", data.responseJSON.result.un);
                     Cookies.set("token", data.responseJSON.result.token);
                 }
                 else{
