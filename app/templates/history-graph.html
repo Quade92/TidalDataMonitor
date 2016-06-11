@@ -38,6 +38,7 @@
                 </div>
 
                 <span><button class="btn btn-default" type="submit" id="datetime-btn">提交</button></span>
+                <span><button class="btn btn-default" type="submit" id="download-csv-btn">下载历史数据</button></span>
 
             </div>
         </div>
@@ -80,6 +81,7 @@
     </script>
     <script>
         register_datetime_btn();
+        register_download_csv_btn();
         var graph = new HistoryData();
         graph.init();
     </script>

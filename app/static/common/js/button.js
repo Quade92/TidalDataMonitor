@@ -6,7 +6,7 @@ function register_signin_btn() {
         $.ajax({
             type: "POST",
             url: "http://123.56.80.4:5000/authenticate",
-            headers:{
+            headers: {
                 "Content-Type": "application/json"
             },
             dataType: 'json',
@@ -21,7 +21,7 @@ function register_signin_btn() {
                     Cookies.set("un", data.responseJSON.result.un);
                     Cookies.set("token", data.responseJSON.result.token);
                 }
-                else{
+                else {
                     alert("登录失败!");
                     window.location.href = "/"
                 }
@@ -41,8 +41,37 @@ function register_datetime_btn() {
 }
 
 function register_channel_btn() {
-    $("#channel-btn").click(function(event){
+    $("#channel-btn").click(function (event) {
         livegraph.chNO = $("#gen-A-channel-dropdown-button:first-child")[0].childNodes[0].nodeValue.split("：")[0].substring(2);
         livegraph.get_latest_data("#gen-A-channel-selection");
+    });
+}
+
+function register_download_csv_btn() {
+    $("#download-csv-btn").click(function (event) {
+        var start_ts = $('#startdtpicker').data("DateTimePicker").date().unix() * 1000;
+        var end_ts = $("#enddtpicker").data("DateTimePicker").date().unix() * 1000;
+        $.ajax({
+            type: "GET",
+            url: "http://123.56.80.4:5000/history-csv/" + start_ts + "/" + end_ts,
+            headers: {
+                "Authorization": "Bearer " + Cookies.get("token")
+            },
+            complete: function (data) {
+                if (data["status"] == "200") {
+                    alert("下载成功!");
+                    var a = document.createElement('a');
+                    a.href = 'data:attachment/csv;charset=utf-8,' + encodeURIComponent(data.responseText);
+                    a.target = '_blank';
+                    a.download = 'myFile.csv';
+
+                    document.body.appendChild(a);
+                    a.click();
+                }
+                else {
+                    alert("下载失败!");
+                }
+            }
+        });
     });
 }
