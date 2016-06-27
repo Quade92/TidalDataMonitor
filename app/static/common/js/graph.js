@@ -84,33 +84,51 @@ function YAxis(svg) {
         //         return d;
         //     }))
         // ]);
-        self.scale.domain([
-            d3.max(self.value_set, function (d) {
-                return d;
-            }) + 0.1 * Math.abs(d3.max(self.value_set, function (d) {
-                return d;
-            })), 0
-        ]);
+        var min = d3.min(self.value_set, function (d) {
+            return d;
+        });
+        var max = d3.max(self.value_set, function (d) {
+            return d;
+        });
+        if (min == 0 && max == 0) {
+            self.scale.domain([1, -1]);
+        }
+        else if (max < 0) {
+            self.scale.domain([max, min])
+        }
+        else {
+            self.scale.domain([1.1 * max, 0]);
+        }
         self.axis_group.transition()
             .duration(500)
             .call(self.axis);
+
     };
     self.update_latest_value = function (latest_value) {
         self.value_set.unshift(latest_value);
         self.value_set.pop();
-        self.scale.domain([
-            d3.max(self.value_set, function (d) {
-                return d;
-            }) + 0.1 * Math.abs(d3.max(self.value_set, function (d) {
-                return d;
-            })),
-            0
-            // d3.min(self.value_set, function (d) {
-            //     return d;
-            // }) - 0.1 * Math.abs(d3.min(self.value_set, function (d) {
-            //     return d;
-            // }))
-        ]);
+        var min = d3.min(self.value_set, function (d) {
+            return d;
+        });
+        var max = d3.max(self.value_set, function (d) {
+            return d;
+        });
+        if (min == 0 && max == 0) {
+            self.scale.domain([1, -1]);
+        }
+        else if (max < 0) {
+            self.scale.domain([max, min])
+        }
+        else {
+            self.scale.domain([1.1 * max, 0]);
+        }
+        // self.scale.domain([
+        // d3.min(self.value_set, function (d) {
+        //     return d;
+        // }) - 0.1 * Math.abs(d3.min(self.value_set, function (d) {
+        //     return d;
+        // }))
+        // ]);
         self.axis_group.transition()
             .duration(500)
             .call(self.axis);
