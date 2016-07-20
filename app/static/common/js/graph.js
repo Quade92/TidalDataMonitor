@@ -529,9 +529,9 @@ function HistoryData() {
                     }
                     var unitsd = {};
                     for (var j in self.data_set[0].channel) {
-                        unitsd[j] = self.data_set[0].channel[i].unit;
+                        unitsd[j] = self.data_set[0].channel[j].unit;
                     }
-                    self.yaxis.update_label(labelsd[self.chNO] + " / " + unitsd[self.chNO]);
+                    self.yaxis.update_label(labelsd[chNo] + " / " + unitsd[chNo]);
                     self.update_graph_components(chNo);
                     self.update_table();
                 }
