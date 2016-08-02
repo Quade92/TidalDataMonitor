@@ -331,7 +331,6 @@ function LiveLinegraph(graph_div) {
                             self.timeaxis.update_latest_date(latest_date);
                             self.yaxis.update_latest_value(latest_value);
                             self.linepaths.update_latest_json(latest_json, self.timeaxis.scale, self.yaxis.scale);
-                            // TODO restructure
                         }
                     }
                 }
@@ -355,7 +354,6 @@ function LiveLinegraph(graph_div) {
                     var chNO = $(channel_selector + ">button")[0].childNodes[0].nodeValue;
                     self.chNO = chNO.indexOf("CH") == -1 ? "CH1" : chNO.split("：")[0].substring(2);
                     for (var i in self.data_set[0].channel) {
-                        // TODO select label here
                         labelsd[i] = self.data_set[0].channel[i].label;
                     }
                     self.yaxis.update_label(labelsd[self.chNO]);
@@ -419,14 +417,17 @@ function LiveLinegraph(graph_div) {
                 var date = new Date(d.timestamp);
                 return date.toLocaleString("zh-CN", {hour12: false});
             });
-        for (var chNO = 1; chNO != 12; chNO++) {
+        var chNOArr = ["CH1","CH5","CH2","CH6","CH7","CH3","CH8","CH4","CH9","CH10","CH11"]
+        for (var i = 0; i != chNOArr.length; i++) {
             hrow.append("th")
                 .attr("class", "text-left")
-                .html(self.data_set[0].channel["CH" + chNO].label);
+                .html(self.data_set[0].channel[chNOArr[i]].label);
+//                .html(self.data_set[0].channel["CH" + chNO].label);
             tr.append("td")
                 .attr("class", "text-left")
                 .html(function (d) {
-                    return parseFloat(d.channel["CH" + chNO].value).toFixed(2);
+                    return parseFloat(d.channel[chNOArr[i]].value).toFixed(2);
+//                    return parseFloat(d.channel["CH" + chNO].value).toFixed(2);
                 });
         }
     };
@@ -474,11 +475,6 @@ function HistoryData() {
             complete: function (data) {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
-                    //var labelsd = {};
-                    //for (var i in self.data_set[0].channel) {
-                    //    labelsd[i] = self.data_set[0].channel[i].label;
-                    //}
-                    //self.yaxis.update_label(labelsd["CH1"]);
                     var labelsd = {};
                     for (var i in self.data_set[0].channel) {
                         labelsd[i] = self.data_set[0].channel[i].label;
