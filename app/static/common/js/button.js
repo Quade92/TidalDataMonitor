@@ -60,11 +60,12 @@ function register_download_csv_btn() {
             complete: function (data) {
                 if (data["status"] == "200") {
                     alert("下载成功!");
+                    csvData = new Blob([data.responseText], { type: 'text/csv' });
+                    var csvUrl = URL.createObjectURL(csvData);
                     var a = document.createElement('a');
-                    a.href = 'data:attachment/csv;charset=utf-8,' + encodeURIComponent(data.responseText);
+                    a.href =  csvUrl;
                     a.target = '_blank';
                     a.download = 'myFile.csv';
-
                     document.body.appendChild(a);
                     a.click();
                 }

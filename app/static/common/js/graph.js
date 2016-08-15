@@ -418,7 +418,7 @@ function LiveLinegraph(graph_div) {
                 return date.toLocaleString("zh-CN", {hour12: false});
             });
         var chNOArr = ["CH1","CH5","CH2","CH6","CH7","CH3","CH8","CH4","CH9","CH10","CH11"]
-        for (var i = 1; i != chNOArr.length; i++) {
+        for (var i = 0; i != chNOArr.length; i++) {
             hrow.append("th")
                 .attr("class", "text-left")
                 .html(self.data_set[0].channel[chNOArr[i]].label);
