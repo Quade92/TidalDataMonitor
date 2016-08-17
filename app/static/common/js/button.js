@@ -57,8 +57,23 @@ function register_download_csv_btn() {
             headers: {
                 "Authorization": "Bearer " + Cookies.get("token")
             },
+            xhr: function(){
+                var xhr = $.ajaxSettings.xhr() ;
+                xhr.onprogress = function(evt){
+                    var percentComplete = (evt.loaded / evt.total)*100;
+                    $('#progressbar').attr("aria-valuenow", percentComplete);
+                    $('#progressbar').attr("style", "width: "+percentComplete+"%");
+                };
+                xhr.onreadystatechange = function(evt){
+                    if (xhr.readyState==1){
+                        $("#progressbar-div").attr("class", "row monitor-row");
+                    }
+                }
+                return xhr ;
+            },
             complete: function (data) {
                 if (data["status"] == "200") {
+                    $("#progressbar-div").attr("class", "row monitor-row sr-only");
                     alert("下载成功!");
                     csvData = new Blob([data.responseText], { type: 'text/csv' });
                     var csvUrl = URL.createObjectURL(csvData);
