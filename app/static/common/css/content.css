@@ -1,9 +1,13 @@
 body {
     padding-top: 50px;
 }
-.main-content {
+
+/*.intro-content {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
     padding: 40px 15px;
-}
+}*/
 
 div#table-div{
     height: 500px;
@@ -27,4 +31,37 @@ div.monitor-row{
 
 div#channel-selection{
     display: inline-block;
+}
+
+/*.full-screen {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}*/
+
+.carousel{
+    height: 500px;
+    position: relative;
+}
+
+.carousel .item {
+  height: 500px;
+}
+
+.carousel-inner > .item > img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 500px;
+}
+
+.featurette-divider {
+  margin: 80px 0; /* Space out the Bootstrap <hr> more */
+}
+
+/* Thin out the marketing headings */
+.featurette-heading {
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -1px;
 }
