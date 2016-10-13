@@ -101,3 +101,11 @@ div#channel-selection{
     font-weight: bold;
     text-shadow: 2px 2px 1px rgba(0,0,0,10);
 }
+
+.alert {
+    padding: 20px 20px;
+    margin-top: 40px;
+    /* margin-bottom: 20px; */
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
