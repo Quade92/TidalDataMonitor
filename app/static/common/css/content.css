@@ -9,6 +9,10 @@ body {
     padding: 40px 15px;
 }*/
 
+.main-content {
+    padding: 0px 0px;
+}
+
 div#table-div{
     height: 500px;
     overflow: auto;
@@ -42,6 +46,7 @@ div#channel-selection{
 .carousel{
     height: 500px;
     position: relative;
+    margin-top: 40px;
 }
 
 .carousel .item {
@@ -69,7 +74,7 @@ div#channel-selection{
 .navbar>.container .navbar-brand, .navbar>.container-fluid .navbar-brand {
     margin-left: -50px;
     margin-top: 20px;
-    margin-bottom: 20px;
+    margin-bottom: -20px;
 }
 
 .navbar-brand {
