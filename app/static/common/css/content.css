@@ -65,3 +65,34 @@ div#channel-selection{
   line-height: 1;
   letter-spacing: -1px;
 }
+
+.navbar>.container .navbar-brand, .navbar>.container-fluid .navbar-brand {
+    margin-left: -50px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.navbar-brand {
+    font-size: 30px;
+}
+
+.navbar-nav>li {
+    margin-left: 30px;
+}
+
+.navbar-nav>li>a {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 25px;
+}
+
+.carousel-indicators {
+    bottom: 0px;
+}
+
+.carousel-caption {
+    padding-bottom: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    text-shadow: 2px 2px 1px rgba(0,0,0,10);
+}
