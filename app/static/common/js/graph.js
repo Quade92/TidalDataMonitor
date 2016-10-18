@@ -306,9 +306,18 @@ function LiveLinegraph(graph_div) {
                         var latest_record = resp["responseJSON"]["result"];
                         var chNO = $("#gen-A-channel-selection").find(">button")[0].childNodes[0].nodeValue;
                         chNO = chNO.indexOf("CH") == -1 ? "CH1" : chNO.split("：")[0].substring(2);
-                        d3.select("#gen-A-rtd-label").html(
-                            latest_record["channel"][chNO]["value"].toFixed(2) + latest_record["channel"][chNO]["unit"]
-                        ).style("font-size", "30px");
+                        var voltage_value = latest_record["channel"][chNO]["value"].toFixed(2);
+                        if ((chNO=="CH1" || chNO=="CH5") && voltage_value<5) {
+                            d3.select("#gen-A-rtd-label").html(
+                                "0" + latest_record["channel"][chNO]["unit"]
+                            ).style("font-size", "30px");
+                        }
+                        else{
+                            d3.select("#gen-A-rtd-label").html(
+                                latest_record["channel"][chNO]["value"].toFixed(2) + latest_record["channel"][chNO]["unit"]
+                            ).style("font-size", "30px");
+                        }
+
                         if (latest_record.timestamp != self.data_set[0].timestamp) {
                             var labelsd = {};
                             for (var i in self.data_set[0].channel) {
@@ -329,6 +338,10 @@ function LiveLinegraph(graph_div) {
                             self.data_set.pop();
                             self.update_table("#table-div");
                             self.timeaxis.update_latest_date(latest_date);
+                            if ((chNO=="CH1" || chNO=="CH5") && voltage_value<5) {
+                                latest_value = 0;
+                                latest_json.value = 0;
+                            }
                             self.yaxis.update_latest_value(latest_value);
                             self.linepaths.update_latest_json(latest_json, self.timeaxis.scale, self.yaxis.scale);
                         }
@@ -371,6 +384,17 @@ function LiveLinegraph(graph_div) {
                         json.value = d.channel[self.chNO].value;
                         return json;
                     });
+                    var max_value = d3.max(path_data_set, function(d){
+                        return d.value;
+                    });
+                    if ((self.chNO=="CH1" || self.chNO=="CH5") && max_value<5){
+                        for (var i=0; i!=path_data_set.length; i++){
+                            path_data_set[i].value = 0;
+                        }
+                        for (var i=0; i!=value_set.length; i++){
+                            value_set[i] = 0;
+                        }
+                    }
                     self.timeaxis.update_date_set(date_set);
                     self.yaxis.update_value_set(value_set);
                     self.linepaths.update_data_set(path_data_set, self.timeaxis.scale, self.yaxis.scale);
