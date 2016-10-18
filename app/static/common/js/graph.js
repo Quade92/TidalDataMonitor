@@ -72,18 +72,6 @@ function YAxis(svg) {
     };
     self.update_value_set = function (value_set) {
         self.value_set = value_set;
-        // self.scale.domain([
-        //     d3.max(self.value_set, function (d) {
-        //         return d;
-        //     }) + 0.1 * Math.abs(d3.max(self.value_set, function (d) {
-        //         return d;
-        //     })),
-        //     d3.min(self.value_set, function (d) {
-        //         return d;
-        //     }) - 0.1 * Math.abs(d3.min(self.value_set, function (d) {
-        //         return d;
-        //     }))
-        // ]);
         var min = d3.min(self.value_set, function (d) {
             return d;
         });
@@ -122,13 +110,6 @@ function YAxis(svg) {
         else {
             self.scale.domain([1.1 * max, 0]);
         }
-        // self.scale.domain([
-        // d3.min(self.value_set, function (d) {
-        //     return d;
-        // }) - 0.1 * Math.abs(d3.min(self.value_set, function (d) {
-        //     return d;
-        // }))
-        // ]);
         self.axis_group.transition()
             .duration(500)
             .call(self.axis);
@@ -154,7 +135,7 @@ function LinePaths(svg) {
         .append("g")
         .attr("class", "linepaths-g")
         .attr("clip-path", "url(#clip)")
-        .attr("transform", "translate(50, 30)");
+        .attr("transform", "translate(50, 40)");
     self.paths = self.linepaths_group.append("path")
         .attr("class", "datapath");
     self.update_circle_cursors = function () {
