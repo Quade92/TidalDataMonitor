@@ -344,8 +344,10 @@ function LiveLinegraph(graph_div) {
                     self.data_set = data["responseJSON"]["result"];
                     var labelsd = {};
                     var chNO = self.chNO;
-                    for (var i in self.data_set[0].channel) {
-                        labelsd[i] = self.data_set[0].channel[i].label;
+                    var ch = null;
+                    for (var NO=1; NO!=12; NO++){
+                        ch = 'CH'+NO;
+                        labelsd[ch] = self.data_set[0].channel[ch].label;
                     }
                     self.yaxis.update_label(labelsd[self.chNO]);
                     self.init_control(labelsd, self.chNO, "#gen-A-channel-selection");
@@ -385,10 +387,8 @@ function LiveLinegraph(graph_div) {
         var labels = $.map(labelsd, function (ele, key) {
             return key;
         });
-        // d3.select("#gen-A-channel-dropdown-button")
         d3.select(channel_selector + ">button")
             .html("通道" + chNO + "：" + labelsd[chNO] + "<span class='caret'></span>");
-        // d3.select("#gen-A-channel-dropdown-menu")
         d3.select(channel_selector + ">ul")
             .selectAll("li")
             .data(labels)
@@ -478,8 +478,10 @@ function HistoryData() {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
                     var labelsd = {};
-                    for (var i in self.data_set[0].channel) {
-                        labelsd[i] = self.data_set[0].channel[i].label;
+                    var ch = null;
+                    for (var NO=1; NO!=12; NO++){
+                        ch = 'CH'+NO;
+                        labelsd[ch] = self.data_set[0].channel[ch].label;
                     }
                     var unitsd = {};
                     for (var j in self.data_set[0].channel) {
