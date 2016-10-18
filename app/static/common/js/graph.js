@@ -273,7 +273,7 @@ function LiveLinegraph(graph_div) {
     self.timespan = 100;
     self.w = 1000;
     self.h = 500;
-    self.chNO = null;
+    self.chNO = "CH1";
     self.update_latest_record = function () {
         $.ajax({
                 type: "GET",
@@ -285,8 +285,7 @@ function LiveLinegraph(graph_div) {
                 complete: function (resp) {
                     if (resp["responseJSON"]["err"] == "False") {
                         var latest_record = resp["responseJSON"]["result"];
-                        var chNO = $("#gen-A-channel-selection").find(">button")[0].childNodes[0].nodeValue;
-                        chNO = chNO.indexOf("CH") == -1 ? "CH1" : chNO.split("：")[0].substring(2);
+                        var chNO = self.chNO;
                         var voltage_value = latest_record["channel"][chNO]["value"].toFixed(2);
                         if ((chNO=="CH1" || chNO=="CH5") && voltage_value<5) {
                             d3.select("#gen-A-rtd-label").html(
@@ -344,9 +343,7 @@ function LiveLinegraph(graph_div) {
                 if (data["responseJSON"]["err"] == "False") {
                     self.data_set = data["responseJSON"]["result"];
                     var labelsd = {};
-                    // var chNO = $("#gen-A-channel-dropdown-button:first-child")[0].childNodes[0].nodeValue;
-                    var chNO = $(channel_selector + ">button")[0].childNodes[0].nodeValue;
-                    self.chNO = chNO.indexOf("CH") == -1 ? "CH1" : chNO.split("：")[0].substring(2);
+                    var chNO = self.chNO;
                     for (var i in self.data_set[0].channel) {
                         labelsd[i] = self.data_set[0].channel[i].label;
                     }
