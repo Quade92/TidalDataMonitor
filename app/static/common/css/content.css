@@ -71,24 +71,24 @@ div#channel-selection{
   letter-spacing: -1px;
 }
 
-.navbar>.container .navbar-brand, .navbar>.container-fluid .navbar-brand {
-    margin-left: -50px;
+.navbar>.container .navbar-header, .navbar>.container-fluid .navbar-brand {
+    margin-left: 30px;
     margin-top: 20px;
     margin-bottom: -20px;
 }
 
 .navbar-brand {
-    font-size: 30px;
+    font-size: 20px;
 }
 
 .navbar-nav>li {
-    margin-left: 30px;
+    margin-left: 10px;
 }
 
 .navbar-nav>li>a {
     margin-top: 20px;
     margin-bottom: 20px;
-    font-size: 25px;
+    font-size: 20px;
 }
 
 .carousel-indicators {
@@ -108,4 +108,14 @@ div#channel-selection{
     /* margin-bottom: 20px; */
     border: 1px solid transparent;
     border-radius: 4px;
+}
+
+.navbar-brand > div {
+    display: block;
+    font-size: 10px;
+    padding: 5px;
+}
+
+.navbar-brand.powered-by-header{
+    margin-top: 0px;
 }
